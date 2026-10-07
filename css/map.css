@@ -282,20 +282,25 @@
   left: 12%;
   top: 22%;
   width: 76% !important;
-  animation: kilka-jump 4.8s ease-in-out infinite;
+  animation: kilka-jump 3.2s linear infinite;
 }
 
-/* Выныривает головой вверх слева, высоко взлетает, ныряет головой вниз справа.
-   Под водой (последние кадры) незаметно возвращается назад. */
+/* Прыжок — одна плавная дуга (парабола), посчитанная по точкам, без остановок между ними.
+   0–62%: выныривает головой вверх слева, взлетает, ныряет головой вниз справа.
+   62–100%: под водой незаметно возвращается к началу — пауза между прыжками. */
 @keyframes kilka-jump {
-  0%   { transform: translate(-24%, 110%) rotate(-42deg); }
-  14%  { transform: translate(-16%, 30%) rotate(-40deg); }
-  30%  { transform: translate(-6%, -32%) rotate(-24deg); }
-  46%  { transform: translate(2%, -48%) rotate(0deg); }
-  60%  { transform: translate(10%, -34%) rotate(30deg); }
-  76%  { transform: translate(18%, 20%) rotate(62deg); }
-  88%  { transform: translate(22%, 110%) rotate(72deg); }
-  100% { transform: translate(-24%, 110%) rotate(-42deg); }
+  0%    { transform: translate(-24%, 110%) rotate(-42deg); }
+  6.2%  { transform: translate(-19.4%, 53.1%) rotate(-30.6deg); }
+  12.4% { transform: translate(-14.8%, 8.9%) rotate(-19.2deg); }
+  18.6% { transform: translate(-10.2%, -22.7%) rotate(-7.8deg); }
+  24.8% { transform: translate(-5.6%, -41.7%) rotate(3.6deg); }
+  31%   { transform: translate(-1%, -48%) rotate(15deg); }
+  37.2% { transform: translate(3.6%, -41.7%) rotate(26.4deg); }
+  43.4% { transform: translate(8.2%, -22.7%) rotate(37.8deg); }
+  49.6% { transform: translate(12.8%, 8.9%) rotate(49.2deg); }
+  55.8% { transform: translate(17.4%, 53.1%) rotate(60.6deg); }
+  62%   { transform: translate(22%, 110%) rotate(72deg); }
+  100%  { transform: translate(-24%, 110%) rotate(-42deg); }
 }
 
 /* Круги на воде там, где килька выныривает и ныряет */
@@ -308,18 +313,19 @@
   border: 2px solid rgba(255, 255, 255, 0.85);
   border-radius: 50%;
   opacity: 0;
-  animation: kilka-ripple 4.8s ease-out infinite;
+  animation: kilka-ripple 3.2s ease-out infinite;
 }
 
+/* Нырок — на 56% цикла (3.2 с × 0.56 ≈ 1.8 с) */
 .kilka-ripple--out {
   left: 56%;
-  animation-delay: 3.95s;
+  animation-delay: 1.8s;
 }
 
 @keyframes kilka-ripple {
   0%   { opacity: 0;   transform: scale(0.3); }
   6%   { opacity: 0.9; transform: scale(0.5); }
-  30%  { opacity: 0;   transform: scale(1.3); }
+  35%  { opacity: 0;   transform: scale(1.3); }
   100% { opacity: 0;   transform: scale(1.3); }
 }
 
@@ -329,22 +335,27 @@
 .kilka-tomato {
   position: absolute;
   width: 24% !important;
-  animation: tomato-jump 4.8s ease-in-out infinite;
+  animation: tomato-jump 3.2s linear infinite;
 }
 
-.kilka-tomato--1 { left: 4%;  top: 26%; --turn: -38deg; --depth: 260%; animation-delay: 0.12s; }
-.kilka-tomato--2 { left: 44%; top: 6%;  --turn: 52deg;  --depth: 320%; animation-delay: -0.18s; }
-.kilka-tomato--3 { left: 72%; top: 30%; --turn: 160deg; --depth: 250%; animation-delay: 0.3s; }
+.kilka-tomato--1 { left: 4%;  top: 26%; --turn: -38deg; --depth: 260%; animation-delay: 0.08s; }
+.kilka-tomato--2 { left: 44%; top: 6%;  --turn: 52deg;  --depth: 320%; animation-delay: -0.12s; }
+.kilka-tomato--3 { left: 72%; top: 30%; --turn: 160deg; --depth: 250%; animation-delay: 0.2s; }
 
+/* Та же плавная дуга: от глубины --depth вверх до -90% и обратно, с равномерным вращением */
 @keyframes tomato-jump {
-  0%   { transform: translate(-30%, var(--depth)) rotate(var(--turn)); }
-  14%  { transform: translate(-20%, calc(var(--depth) * 0.3)) rotate(calc(var(--turn) + 40deg)); }
-  30%  { transform: translate(-5%, -60%) rotate(calc(var(--turn) + 90deg)); }
-  46%  { transform: translate(10%, -90%) rotate(calc(var(--turn) + 140deg)); }
-  62%  { transform: translate(25%, -60%) rotate(calc(var(--turn) + 190deg)); }
-  80%  { transform: translate(45%, 120%) rotate(calc(var(--turn) + 250deg)); }
-  90%  { transform: translate(55%, var(--depth)) rotate(calc(var(--turn) + 280deg)); }
-  100% { transform: translate(-30%, var(--depth)) rotate(var(--turn)); }
+  0%    { transform: translate(-30%, var(--depth)) rotate(var(--turn)); }
+  6.2%  { transform: translate(-21.5%, calc(var(--depth) * 0.64 - 32.4%)) rotate(calc(var(--turn) + 28deg)); }
+  12.4% { transform: translate(-13%, calc(var(--depth) * 0.36 - 57.6%)) rotate(calc(var(--turn) + 56deg)); }
+  18.6% { transform: translate(-4.5%, calc(var(--depth) * 0.16 - 75.6%)) rotate(calc(var(--turn) + 84deg)); }
+  24.8% { transform: translate(4%, calc(var(--depth) * 0.04 - 86.4%)) rotate(calc(var(--turn) + 112deg)); }
+  31%   { transform: translate(12.5%, -90%) rotate(calc(var(--turn) + 140deg)); }
+  37.2% { transform: translate(21%, calc(var(--depth) * 0.04 - 86.4%)) rotate(calc(var(--turn) + 168deg)); }
+  43.4% { transform: translate(29.5%, calc(var(--depth) * 0.16 - 75.6%)) rotate(calc(var(--turn) + 196deg)); }
+  49.6% { transform: translate(38%, calc(var(--depth) * 0.36 - 57.6%)) rotate(calc(var(--turn) + 224deg)); }
+  55.8% { transform: translate(46.5%, calc(var(--depth) * 0.64 - 32.4%)) rotate(calc(var(--turn) + 252deg)); }
+  62%   { transform: translate(55%, var(--depth)) rotate(calc(var(--turn) + 280deg)); }
+  100%  { transform: translate(-30%, var(--depth)) rotate(var(--turn)); }
 }
 
 /* ---------- Десктоп: объекты крупнее, расстояния больше ---------- */
