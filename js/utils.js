@@ -13,6 +13,18 @@ export function el(tag, props = {}, children = []) {
   return node;
 }
 
+// Вставляет текст в элемент. \n в тексте — принудительный перенос: каждая строка
+// становится отдельным блоком, чтобы браузер ровно раскладывал по ширине каждую строку
+export function setText(node, text) {
+  const lines = text.split('\n');
+  if (lines.length === 1) {
+    node.textContent = lines[0];
+  } else {
+    node.replaceChildren(...lines.map((line) => el('span', { className: 'text-line', text: line })));
+  }
+  return node;
+}
+
 // Пользователь попросил систему убрать лишнее движение
 export function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -1,4 +1,319 @@
-/* Раздел «Айсберг: вирусный проект. Задание: docs/01-iceberg.md» */
+/* Раздел «Вирусный проект» (айсберг). Задание: docs/01-iceberg.md
+   Сцена сверху вниз: небо → линия воды → толща воды, темнеющая к дну → дно.
+   Размеры сцены — в высотах экрана (vh), поэтому расстояния одинаково ощущаются на любом устройстве. */
 
 .section--iceberg {
+  background: #1d1d36; /* видно только при «перетягивании» скролла у дна */
+}
+
+.iceberg {
+  --question-fade: 250ms; /* должно совпадать с FADE_MS в js/iceberg.js */
+
+  position: relative;
+  min-height: 100%;
+  /* Небо. Ниже линии воды сцена закрашивает фон водой */
+  background: linear-gradient(180deg, var(--c-sky-top) 0, var(--c-sky-horizon) 110vh) no-repeat, var(--c-sky-horizon);
+}
+
+/* Зерно бумаги, как на карте */
+.iceberg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.28;
+  mix-blend-mode: multiply;
+  background-image: var(--grain);
+}
+
+/* ---------- Заголовок: закреплён сверху ---------- */
+
+.iceberg__header {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 80px;
+  /* Слева место под общую кнопку «На карту» */
+  padding: 0 var(--gutter) 0 170px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.iceberg__title {
+  font-size: clamp(1.125rem, 0.8rem + 1.4vw, 1.75rem);
+}
+
+.iceberg__title:focus {
+  outline: none;
+}
+
+.iceberg__subtitle {
+  position: relative;
+  z-index: 5;
+  max-width: 40em;
+  margin: 0 auto;
+  padding: 32px var(--gutter) 0;
+  font-size: calc(var(--text-size) * 1.1);
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Вторая строка подписи — «Сильно углубиться» — отдельной строкой с отступом */
+.iceberg__subtitle .text-line + .text-line {
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+/* ---------- Сцена ---------- */
+
+.iceberg__scene {
+  --ice-top: 6vh;   /* верхушка айсберга от начала сцены */
+  --above: 72vh;    /* линия воды от начала сцены */
+  --below: 140vh;   /* толща воды */
+  --seabed: 36vh;   /* дно */
+
+  position: relative;
+  height: calc(var(--above) + var(--below) + var(--seabed));
+  /* Вода: светлая у поверхности, темнеет к дну — так при скролле вниз фон темнеет */
+  background: linear-gradient(
+    180deg,
+    transparent 0,
+    transparent var(--above),
+    #8fc4f2 var(--above),
+    #5c9be0 calc(var(--above) + 35vh),
+    var(--c-deep-1) calc(var(--above) + 85vh),
+    var(--c-deep-2) calc(var(--above) + 125vh),
+    var(--c-deep-3) calc(var(--above) + var(--below)),
+    #1d1d36 100%
+  );
+}
+
+/* Поверхность воды: волна с пеной поперёк всей ширины */
+.iceberg__surface {
+  position: absolute;
+  top: calc(var(--above) - 14px);
+  left: 0;
+  width: 100%;
+  height: 28px;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='28'><path d='M0 14 C30 6 50 6 80 14 S130 22 160 14 S210 6 240 14 V28 H0 Z' fill='%238fc4f2'/><path d='M0 14 C30 6 50 6 80 14 S130 22 160 14 S210 6 240 14' fill='none' stroke='white' stroke-width='3' opacity='0.85'/></svg>") repeat-x left top / 240px 28px;
+}
+
+/* Лучи света под водой */
+.iceberg__rays {
+  position: absolute;
+  top: var(--above);
+  left: 0;
+  width: 100%;
+  height: 110vh;
+  background: repeating-linear-gradient(105deg, rgba(255, 255, 255, 0.1) 0 46px, transparent 46px 170px);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Айсберг. Линия воды в картинке — на 30,87% её высоты, поэтому высота
+   подобрана так, чтобы она совпала с --above */
+.iceberg__ice {
+  position: absolute;
+  top: var(--ice-top);
+  left: 50%;
+  width: min(88vw, 440px);
+  max-width: none;
+  height: calc((var(--above) - var(--ice-top)) / 0.3087);
+  transform: translateX(-50%);
+  filter: drop-shadow(0 10px 18px rgba(20, 30, 60, 0.25));
+}
+
+.iceberg__seabed {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 34vh;
+  background: url('../assets/iceberg/seabed.svg') center bottom / cover no-repeat;
+}
+
+/* Финальная строка на дне: статичный текст, проявляется в конце скролла */
+.iceberg__bottom {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  bottom: 9vh;
+  padding: 0 var(--gutter);
+  color: var(--c-white);
+  font-family: var(--font-heading);
+  font-size: clamp(1.25rem, 0.9rem + 1.6vw, 2.125rem);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+  opacity: 0;
+  translate: 0 16px;
+  transition: opacity 700ms var(--ease), translate 700ms var(--ease);
+}
+
+.iceberg__bottom.is-visible {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* ---------- Уровни: слова-кнопки и вопросы ---------- */
+
+.iceberg__levels {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none; /* кликабельны только сами слова */
+}
+
+/* Точка уровня на айсберге: у неё нет высоты, слово центрируется на ней */
+.iceberg__level {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+}
+
+/* Слово с вопросом: центр — в точке уровня */
+.iceberg__anchor {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -50%);
+}
+
+.iceberg__word {
+  display: block;
+  min-height: 44px;
+  padding: 8px 22px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  font-family: var(--font-heading);
+  font-size: clamp(1rem, 0.85rem + 0.6vw, 1.375rem);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: scale 180ms var(--ease), background-color 180ms var(--ease), color 180ms var(--ease);
+}
+
+.iceberg__word:hover {
+  scale: 1.05;
+}
+
+/* Над водой — светлая плашка, тёмный текст */
+.is-above .iceberg__word {
+  color: var(--c-text);
+  background: var(--c-white);
+  box-shadow: 0 4px 14px rgba(28, 52, 60, 0.2);
+}
+
+/* Под водой — тёмная полупрозрачная плашка, белый текст */
+.is-underwater .iceberg__word {
+  color: var(--c-white);
+  background: rgba(29, 29, 54, 0.55);
+  border-color: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.is-underwater .iceberg__word:focus-visible {
+  outline-color: var(--c-white);
+}
+
+/* Активное слово */
+.iceberg__level.is-active .iceberg__word {
+  color: var(--c-text);
+  background: var(--c-coral);
+  border-color: var(--c-coral);
+}
+
+/* Вопрос: на телефоне — карточкой под словом */
+.iceberg__question {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  width: min(420px, calc(100vw - 2 * var(--gutter)));
+  margin: 0;
+  transform: translateX(-50%);
+  padding: 14px 18px;
+  border-left: 4px solid var(--c-coral);
+  border-radius: var(--radius);
+  color: var(--c-text);
+  background: var(--c-white);
+  box-shadow: 0 10px 30px rgba(20, 30, 60, 0.25);
+  line-height: 1.4;
+  pointer-events: auto;
+  opacity: 0;
+  translate: 0 8px;
+  transition: opacity var(--question-fade) var(--ease), translate var(--question-fade) var(--ease);
+}
+
+.iceberg__question.is-visible {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* ---------- Появление при входе в раздел ---------- */
+
+.iceberg.is-entering .iceberg__header {
+  animation: iceberg-in 500ms var(--ease) both;
+}
+
+.iceberg.is-entering .iceberg__subtitle {
+  animation: iceberg-in 500ms var(--ease) 250ms both;
+}
+
+.iceberg.is-entering .iceberg__scene {
+  animation: iceberg-fade 600ms var(--ease) 450ms both;
+}
+
+@keyframes iceberg-in {
+  from { opacity: 0; translate: 0 -12px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+@keyframes iceberg-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---------- Десктоп: айсберг по центру, вопрос сбоку от слова ---------- */
+
+@media (min-width: 768px) {
+  .iceberg__header {
+    justify-content: center;
+    padding-left: 200px;
+    padding-right: 200px;
+  }
+
+  .iceberg__subtitle {
+    padding-top: 40px;
+  }
+
+  .iceberg__ice {
+    width: clamp(300px, 36vw, 520px);
+  }
+
+  /* Справа от слова, по центру его высоты */
+  .iceberg__question {
+    top: 50%;
+    left: calc(100% + 18px);
+    width: min(340px, calc(50vw - 170px));
+    transform: translateY(-50%);
+    translate: -8px 0;
+  }
+
+  .iceberg__question.is-visible {
+    translate: 0 0;
+  }
 }

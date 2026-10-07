@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 170 1600 250" preserveAspectRatio="xMidYMax slice">
+  <!-- Морское дно для раздела «Вирусный проект»: камни и водоросли в стиле вырезанной бумаги -->
+  <defs>
+    <filter id="brush" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7"/>
+      <feDisplacementMap in="SourceGraphic" scale="6"/>
+    </filter>
+  </defs>
+  <g filter="url(#brush)">
+    <!-- Водоросли за камнями -->
+    <g fill="none" stroke-linecap="round">
+      <path d="M180 330 C170 270 200 230 186 170 C178 140 196 110 190 80" stroke="#0e9e92" stroke-width="10" opacity="0.7"/>
+      <path d="M210 330 C222 280 200 250 214 200 C222 170 210 150 218 120" stroke="#14d1c1" stroke-width="8" opacity="0.6"/>
+      <path d="M1360 320 C1350 260 1380 220 1366 160 C1360 130 1376 100 1370 70" stroke="#0e9e92" stroke-width="10" opacity="0.7"/>
+      <path d="M1396 320 C1406 270 1386 240 1398 190 C1404 160 1394 140 1402 110" stroke="#14d1c1" stroke-width="8" opacity="0.6"/>
+      <path d="M560 340 C552 300 572 270 562 230" stroke="#14d1c1" stroke-width="7" opacity="0.5"/>
+      <path d="M1060 340 C1070 300 1052 270 1062 226" stroke="#0e9e92" stroke-width="7" opacity="0.55"/>
+    </g>
+    <!-- Дальние камни -->
+    <path d="M0 300 C120 250 220 280 320 300 C420 240 540 250 640 290 C760 260 880 270 980 300 C1080 250 1200 250 1300 290 C1420 250 1520 270 1600 290 L1600 420 L0 420 Z" fill="#3d3775"/>
+    <!-- Ближнее дно -->
+    <path d="M0 350 C160 320 300 340 460 350 C620 330 760 320 900 345 C1060 330 1220 320 1380 345 C1480 335 1560 340 1600 345 L1600 420 L0 420 Z" fill="#4c4590"/>
+    <!-- Светлые края камней и ближнего дна -->
+    <path d="M0 350 C160 320 300 340 460 350 C620 330 760 320 900 345 C1060 330 1220 320 1380 345 C1480 335 1560 340 1600 345" fill="none" stroke="#6f66b8" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+    <path d="M320 300 C420 240 540 250 640 290" fill="none" stroke="#6f66b8" stroke-width="6" stroke-linecap="round"/>
+    <path d="M980 300 C1080 250 1200 250 1300 290" fill="none" stroke="#6f66b8" stroke-width="6" stroke-linecap="round"/>
+  </g>
+</svg>
