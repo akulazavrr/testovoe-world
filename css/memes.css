@@ -17,12 +17,25 @@
 
 /* ---------- Небо и солнце ---------- */
 
+/* Небо такое же, как на главной карте: тот же градиент и те же облачка с птицами */
 .memes__sky {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: linear-gradient(180deg, #b4e1f8 0%, #86d2f3 50%, #6cc7ef 100%);
+  background:
+    url('../assets/map/sky.svg') center top / cover no-repeat,
+    linear-gradient(180deg, var(--c-sky-top) 0%, var(--c-sky-mid) 40%, var(--c-sky-horizon) 60%);
   transition: opacity 500ms var(--ease);
+}
+
+/* Зерно бумаги, как на карте */
+.memes__sky::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.32;
+  mix-blend-mode: multiply;
+  background-image: var(--grain);
 }
 
 /* Солнце наполовину выглядывает из-за верхнего края и светит вниз, на мемы */
@@ -116,7 +129,7 @@
   border-radius: clamp(10px, 1.6vw, 18px);
   background: var(--c-white);
   box-shadow: 0 14px 30px rgba(30, 60, 90, 0.25);
-  cursor: zoom-in;
+  cursor: pointer;
   transform: translateY(var(--lift)) rotate(var(--tilt));
   transition: scale 200ms var(--ease), opacity 150ms var(--ease);
 }
@@ -179,9 +192,14 @@
   padding: 72px var(--gutter) 24px;
   border: 0;
   background: rgba(25, 45, 70, 0.6);
-  cursor: zoom-out;
+  cursor: pointer;
   opacity: 0;
   transition: opacity 200ms var(--ease);
+}
+
+/* Закрытый просмотр убирается полностью, иначе невидимый слой перехватывает клики */
+.memes__lightbox[hidden] {
+  display: none;
 }
 
 .memes__lightbox.is-visible {
