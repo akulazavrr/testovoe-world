@@ -10,7 +10,9 @@ const NAME = 'house';
 const DOOR_MS = 500;  // должно совпадать с transition двери в css/map.css
 const FADE_MS = 300;  // должно совпадать с --popup-fade в css/house.css
 const SWIPE_PX = 50;  // минимальная длина свайпа
-const POPUP_DELAY_MS = 1600; // сколько показывать интерьер до появления поп-апа
+// Сколько показывать чёткую комнату с Кабачком до появления поп-апа
+// (из них ~0,7 с — анимация входа в дом)
+const POPUP_DELAY_MS = 3000;
 
 let root = null;
 let wrapper = null;
@@ -108,17 +110,15 @@ function openPopup({ delay = 0 } = {}) {
   popup.hidden = false;
   reopenButton.hidden = true;
   popup.classList.remove('is-visible');
-  // Размытие комнаты и поп-ап появляются одновременно
+  // Размытие комнаты и поп-ап появляются одновременно. Пауза перед ними — не движение,
+  // поэтому сохраняется и при «уменьшить движение» (там просто нет плавных переходов)
   const show = () => {
     wrapper.classList.add('is-popup-open');
     popup.classList.add('is-visible');
   };
-  if (prefersReducedMotion()) {
-    show();
-  } else {
-    void popup.offsetWidth;
-    hideTimer = setTimeout(show, delay);
-  }
+  void popup.offsetWidth;
+  if (delay > 0) hideTimer = setTimeout(show, delay);
+  else requestAnimationFrame(show);
 }
 
 function closePopup() {
