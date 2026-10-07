@@ -22,15 +22,39 @@
 
 /* ---------- Интерьер ---------- */
 
-.house__interior {
+/* Комната в пропорциях картинки интерьера (1600×1000), растянута так, чтобы
+   закрыть весь экран (как cover). Всё внутри позиционируется в процентах комнаты. */
+.house__room {
   position: absolute;
-  inset: -3%;
-  background: url('../assets/house/interior.svg') center / cover no-repeat;
+  left: 50%;
+  top: 50%;
+  width: max(104vw, 104vh * 1.6);
+  aspect-ratio: 1600 / 1000;
+  transform: translate(-50%, -50%);
   transition: filter 400ms var(--ease);
 }
 
+.house__interior {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+/* Качок Кабачок стоит на ковре (ноги на y≈880 из 1000) и ростом
+   доходит до низа картины на стене (y≈330). Ноги — на 70% ширины картинки. */
+.house__hero {
+  position: absolute;
+  top: 33%;
+  left: 39.5%;
+  height: 55%;
+  width: auto;
+  max-width: none;
+}
+
 /* Зерно бумаги, как на карте */
-.house__interior::after {
+.house__room::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -39,9 +63,9 @@
   background-image: var(--grain);
 }
 
-/* Пока поп-ап открыт, интерьер слегка размыт и затемнён, чтобы текст читался */
-.house.is-popup-open .house__interior {
-  filter: blur(5px) brightness(0.88);
+/* Пока поп-ап открыт, комната слегка размыта и затемнена, чтобы текст читался */
+.house.is-popup-open .house__room {
+  filter: blur(4px) brightness(0.9);
 }
 
 .house__dim {
@@ -57,13 +81,13 @@
 }
 
 /* Вход в дом: интерьер «надвигается», как будто проходим в дверь */
-.house.is-entering .house__interior {
-  animation: house-enter 600ms var(--ease) backwards;
+.house.is-entering .house__room {
+  animation: house-enter 700ms var(--ease) backwards;
 }
 
 @keyframes house-enter {
-  from { opacity: 0; transform: scale(1.25); }
-  to   { opacity: 1; transform: scale(1); }
+  from { opacity: 0; scale: 1.25; }
+  to   { opacity: 1; scale: 1; }
 }
 
 /* Кнопка, которая снова открывает поп-ап, когда его закрыли крестиком */
@@ -103,7 +127,8 @@
   display: flex;
   flex-direction: column;
   border-radius: 24px 24px 0 0;
-  background: var(--c-white);
+  /* Полупрозрачный белый: интерьер чуть-чуть просвечивает */
+  background: rgba(255, 255, 255, 0.86);
   box-shadow: 0 -10px 40px rgba(30, 24, 44, 0.3);
   opacity: 0;
   translate: 0 24px;
@@ -152,6 +177,8 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 56px var(--gutter) 32px;
+  /* Полоса прокрутки: дорожка прозрачная, ползунок и стрелки белые */
+  scrollbar-color: var(--c-white) transparent;
 }
 
 .house__page:focus {
@@ -252,7 +279,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
-  border-top: 1px solid #eef0f6;
+  border-top: 1px solid rgba(42, 42, 74, 0.08);
 }
 
 .house__nav-side--end {
@@ -334,6 +361,10 @@
 
   .house__nav {
     padding: 16px 32px;
+  }
+
+  .house__popup {
+    background: rgba(255, 255, 255, 0.84);
   }
 
   .house__arrow {

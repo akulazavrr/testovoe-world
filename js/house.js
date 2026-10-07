@@ -10,6 +10,7 @@ const NAME = 'house';
 const DOOR_MS = 500;  // должно совпадать с transition двери в css/map.css
 const FADE_MS = 300;  // должно совпадать с --popup-fade в css/house.css
 const SWIPE_PX = 50;  // минимальная длина свайпа
+const POPUP_DELAY_MS = 1600; // сколько показывать интерьер до появления поп-апа
 
 let root = null;
 let wrapper = null;
@@ -104,15 +105,19 @@ function showPage(index, { focus = false } = {}) {
 function openPopup({ delay = 0 } = {}) {
   clearTimeout(hideTimer);
   popupOpen = true;
-  wrapper.classList.add('is-popup-open');
   popup.hidden = false;
   reopenButton.hidden = true;
   popup.classList.remove('is-visible');
-  if (prefersReducedMotion()) {
+  // Размытие комнаты и поп-ап появляются одновременно
+  const show = () => {
+    wrapper.classList.add('is-popup-open');
     popup.classList.add('is-visible');
+  };
+  if (prefersReducedMotion()) {
+    show();
   } else {
     void popup.offsetWidth;
-    hideTimer = setTimeout(() => popup.classList.add('is-visible'), delay);
+    hideTimer = setTimeout(show, delay);
   }
 }
 
@@ -238,8 +243,15 @@ export function init(sectionRoot, content) {
     pages[current].focus({ preventScroll: true });
   });
 
+  // Комната: интерьер и персонаж в одной системе координат, чтобы Кабачок
+  // всегда стоял на ковре, как бы ни обрезался фон на разных экранах
+  const room = el('div', { className: 'house__room', attrs: { 'aria-hidden': 'true' } }, [
+    el('img', { className: 'house__interior', src: 'assets/house/interior.svg', alt: '', loading: 'lazy' }),
+    el('img', { className: 'house__hero', src: 'assets/house/kabachok.png', alt: '', loading: 'lazy' }),
+  ]);
+
   wrapper = el('div', { className: 'house' }, [
-    el('div', { className: 'house__interior', attrs: { 'aria-hidden': 'true' } }),
+    room,
     el('div', { className: 'house__dim', attrs: { 'aria-hidden': 'true' } }),
     reopenButton,
     popup,
@@ -266,7 +278,8 @@ export function onOpen() {
   pages[0].hidden = false;
   pages[0].classList.remove('is-entering-next', 'is-entering-prev');
   updateNav();
-  openPopup({ delay: 350 });
+  // Сначала видна комната с Кабачком, поп-ап появляется после паузы
+  openPopup({ delay: POPUP_DELAY_MS });
 
   wrapper.classList.remove('is-entering');
   void wrapper.offsetWidth;
