@@ -1,33 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 120">
-  <!-- «Мемное облако»: два слипшихся облака, белое и розовое -->
-  <defs>
-    <filter id="brush" x="-5%" y="-5%" width="110%" height="110%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="2"/>
-      <feDisplacementMap in="SourceGraphic" scale="4"/>
-    </filter>
-    <filter id="blur"><feGaussianBlur stdDeviation="5"/></filter>
-    <clipPath id="pink-shape">
-      <circle cx="136" cy="62" r="22"/><circle cx="162" cy="44" r="27"/><circle cx="190" cy="62" r="20"/>
-      <rect x="116" y="58" width="94" height="34" rx="17"/>
-    </clipPath>
-    <clipPath id="white-shape">
-      <circle cx="46" cy="70" r="24"/><circle cx="78" cy="46" r="33"/><circle cx="114" cy="64" r="24"/>
-      <rect x="22" y="64" width="116" height="34" rx="17"/>
-    </clipPath>
-  </defs>
-
-  <g filter="url(#brush)">
-    <!-- Розовое облако -->
-    <g clip-path="url(#pink-shape)">
-      <rect x="100" y="0" width="120" height="120" fill="#ffd0ee"/>
-      <ellipse cx="166" cy="98" rx="60" ry="22" fill="#f2a9d6" filter="url(#blur)"/>
-      <ellipse cx="150" cy="34" rx="22" ry="12" fill="#fff0fa" filter="url(#blur)"/>
-    </g>
-    <!-- Белое облако -->
-    <g clip-path="url(#white-shape)">
-      <rect x="0" y="0" width="150" height="120" fill="#ffffff"/>
-      <ellipse cx="86" cy="104" rx="76" ry="24" fill="#d6e2f3" filter="url(#blur)"/>
-      <ellipse cx="128" cy="78" rx="14" ry="20" fill="#e6edf8" filter="url(#blur)"/>
-    </g>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 160"><defs>
+  <radialGradient id="lobe" cx="0.5" cy="0.5" r="0.5" fx="0.4" fy="0.34">
+    <stop offset="0" stop-color="#ffffff"/>
+    <stop offset="0.6" stop-color="#ffffff"/>
+    <stop offset="0.84" stop-color="#f1f5fc"/>
+    <stop offset="0.96" stop-color="#d4e1f5"/>
+    <stop offset="1" stop-color="#c3d5f1"/>
+  </radialGradient>
+  <filter id="pencil" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9 0.12" numOctaves="2" seed="2" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.66  0 0 0 0 0.88  0 0 0 0.3 0" result="tint"/>
+    <feComposite in="tint" in2="SourceAlpha" operator="in" result="tex"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="6" result="warp"/>
+    <feDisplacementMap in="SourceGraphic" in2="warp" scale="3" result="shape"/>
+    <feMerge><feMergeNode in="shape"/><feMergeNode in="tex"/></feMerge>
+  </filter>
+</defs>
+<g filter="url(#pencil)"><circle cx="89.3" cy="66" r="18.8" fill="url(#lobe)"/><circle cx="65" cy="70.3" r="20.8" fill="url(#lobe)"/><circle cx="103.1" cy="73.7" r="20.5" fill="url(#lobe)"/><circle cx="55.6" cy="81.3" r="20.9" fill="url(#lobe)"/><circle cx="110.7" cy="93.6" r="18.7" fill="url(#lobe)"/><circle cx="55.6" cy="102.7" r="19" fill="url(#lobe)"/><circle cx="105.9" cy="106.9" r="21.2" fill="url(#lobe)"/><circle cx="66.2" cy="114.5" r="21.5" fill="url(#lobe)"/><circle cx="84.6" cy="118.8" r="20.6" fill="url(#lobe)"/><circle cx="94.8" cy="95.7" r="17.3" fill="url(#lobe)"/><circle cx="82.2" cy="104.5" r="17.3" fill="url(#lobe)"/><circle cx="69.3" cy="96" r="17.3" fill="url(#lobe)"/><circle cx="73.9" cy="82" r="17.3" fill="url(#lobe)"/><circle cx="89.7" cy="81.8" r="17.3" fill="url(#lobe)"/><circle cx="80.1" cy="89.1" r="15.4" fill="url(#lobe)"/><circle cx="243.4" cy="68.4" r="19.4" fill="url(#lobe)"/><circle cx="227.3" cy="71.1" r="18" fill="url(#lobe)"/><circle cx="262.4" cy="78.9" r="17.5" fill="url(#lobe)"/><circle cx="213.4" cy="87" r="18.8" fill="url(#lobe)"/><circle cx="267.4" cy="91.1" r="20.1" fill="url(#lobe)"/><circle cx="213.7" cy="101.8" r="20.7" fill="url(#lobe)"/><circle cx="261.9" cy="109.7" r="17.9" fill="url(#lobe)"/><circle cx="228.5" cy="117.4" r="20.5" fill="url(#lobe)"/><circle cx="248.5" cy="118.5" r="18.1" fill="url(#lobe)"/><circle cx="252.3" cy="97.5" r="16.6" fill="url(#lobe)"/><circle cx="240.2" cy="106" r="16.6" fill="url(#lobe)"/><circle cx="227.8" cy="97.9" r="16.6" fill="url(#lobe)"/><circle cx="232.3" cy="84.4" r="16.6" fill="url(#lobe)"/><circle cx="247.4" cy="84.2" r="16.6" fill="url(#lobe)"/><circle cx="238.2" cy="91.2" r="14.7" fill="url(#lobe)"/><circle cx="164.3" cy="42.4" r="25.3" fill="url(#lobe)"/><circle cx="145.7" cy="44.7" r="28.8" fill="url(#lobe)"/><circle cx="188.7" cy="54.2" r="25.8" fill="url(#lobe)"/><circle cx="125.1" cy="63" r="27.4" fill="url(#lobe)"/><circle cx="198.3" cy="76.2" r="26" fill="url(#lobe)"/><circle cx="123.9" cy="90.1" r="26.5" fill="url(#lobe)"/><circle cx="192" cy="97.8" r="24.7" fill="url(#lobe)"/><circle cx="145.8" cy="111.3" r="28.8" fill="url(#lobe)"/><circle cx="165" cy="113.5" r="25.7" fill="url(#lobe)"/><circle cx="177.1" cy="82.9" r="23" fill="url(#lobe)"/><circle cx="160.3" cy="94.6" r="23" fill="url(#lobe)"/><circle cx="143" cy="83.4" r="23" fill="url(#lobe)"/><circle cx="149.3" cy="64.7" r="23" fill="url(#lobe)"/><circle cx="170.3" cy="64.4" r="23" fill="url(#lobe)"/><circle cx="157.4" cy="74.2" r="20.5" fill="url(#lobe)"/></g></svg>

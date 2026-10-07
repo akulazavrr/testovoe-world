@@ -1,28 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 150">
-  <!-- «Айсберг вирусного спеца»: малая часть над водой, большая под водой -->
+  <!-- «Айсберг вирусного спеца». Одна цельная фигура; граница воды — одна волнистая линия -->
   <defs>
     <filter id="brush" x="-5%" y="-5%" width="110%" height="110%">
       <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="9"/>
       <feDisplacementMap in="SourceGraphic" scale="3"/>
     </filter>
+    <filter id="blur"><feGaussianBlur stdDeviation="1.2"/></filter>
+    <!-- Силуэт айсберга целиком -->
+    <clipPath id="ice">
+      <path d="M20 60 L48 22 L62 32 L82 6 L108 40 L120 60 L134 96 L114 136 L56 146 L8 104 Z"/>
+    </clipPath>
   </defs>
 
   <g filter="url(#brush)">
-    <!-- Подводная часть просвечивает сквозь воду -->
-    <path d="M14 60 L126 60 L136 96 L114 136 L56 146 L8 104 Z" fill="#b6d8f7" opacity="0.75"/>
-    <path d="M70 60 L126 60 L136 96 L114 136 L60 120 Z" fill="#8cbbe9" opacity="0.6"/>
-    <path d="M14 60 L40 60 L30 100 L8 104 Z" fill="#d5e9fb" opacity="0.6"/>
-
-    <!-- Надводная часть -->
-    <path d="M20 60 L48 22 L62 32 L82 6 L108 40 L120 60 Z" fill="#ffffff"/>
-    <path d="M82 6 L108 40 L120 60 L86 60 L78 30 Z" fill="#cfe2f7"/>
-    <path d="M48 22 L62 32 L56 60 L44 60 Z" fill="#e6f1fd"/>
-    <path d="M20 60 L48 22 L36 60 Z" fill="#f4f9ff"/>
+    <g clip-path="url(#ice)">
+      <!-- Грани, общие для надводной и подводной части -->
+      <rect width="140" height="150" fill="#ffffff"/>
+      <path d="M82 6 L108 40 L120 60 L134 96 L114 136 L84 96 L78 30 Z" fill="#cfe2f7"/>
+      <path d="M48 22 L62 32 L60 96 L40 80 Z" fill="#e8f2fd"/>
+      <path d="M8 104 L30 70 L56 146 Z" fill="#dbeafa"/>
+      <path d="M84 96 L114 136 L56 146 Z" fill="#b9d4f2"/>
+      <!-- Вода поверх подводной части. Её верхний край — та же волна, что у поверхности -->
+      <path d="M0 61 Q8 56 16 61 T32 61 T48 61 T64 61 T80 61 T96 61 T112 61 T128 61 T144 61 L144 150 L0 150 Z" fill="#4f8ad6" opacity="0.5"/>
+    </g>
   </g>
 
-  <!-- Линия воды и пена -->
-  <path d="M0 60 Q8 55 16 60 T32 60 T48 60 T64 60 T80 60 T96 60 T112 60 T128 60 T140 60" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+  <!-- Пена вдоль кромки воды только у самого айсберга -->
+  <g clip-path="url(#ice)">
+    <path d="M0 61 Q8 56 16 61 T32 61 T48 61 T64 61 T80 61 T96 61 T112 61 T128 61 T144 61" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.85" filter="url(#blur)"/>
+  </g>
   <g fill="#ffffff" opacity="0.8">
-    <ellipse cx="10" cy="62" rx="5" ry="1.6"/><ellipse cx="128" cy="62" rx="6" ry="1.6"/>
+    <ellipse cx="12" cy="62" rx="7" ry="1.6"/><ellipse cx="127" cy="62" rx="8" ry="1.6"/>
   </g>
 </svg>

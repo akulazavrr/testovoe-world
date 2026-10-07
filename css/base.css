@@ -106,6 +106,12 @@ button {
   outline-offset: 4px;
 }
 
+/* Строка текста с принудительным переносом (\n в content.js) */
+.text-line {
+  display: block;
+  text-wrap: balance;
+}
+
 /* Скрыть визуально, оставить для скринридеров */
 .visually-hidden {
   position: absolute;

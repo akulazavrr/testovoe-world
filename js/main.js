@@ -4,7 +4,7 @@
 // Поэтому работает кнопка «Назад» в браузере и прямые ссылки на раздел.
 
 import { content } from './content.js';
-import { prefersReducedMotion, sectionTitleId } from './utils.js';
+import { el, prefersReducedMotion, sectionTitleId } from './utils.js';
 import * as memes from './memes.js';
 import * as house from './house.js';
 import * as iceberg from './iceberg.js';
@@ -30,7 +30,14 @@ function getText(path) {
 
 function fillTexts() {
   for (const node of document.querySelectorAll('[data-text]')) {
-    node.textContent = getText(node.dataset.text);
+    // \n в тексте — принудительный перенос: каждая строка становится блоком,
+    // чтобы браузер мог ровно разложить по ширине каждую строку отдельно
+    const lines = getText(node.dataset.text).split('\n');
+    if (lines.length === 1) {
+      node.textContent = lines[0];
+    } else {
+      node.replaceChildren(...lines.map((line) => el('span', { className: 'text-line', text: line })));
+    }
   }
 
   backButton.setAttribute('aria-label', content.ui.backToMapAria);

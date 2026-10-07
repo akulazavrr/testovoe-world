@@ -64,46 +64,66 @@ foreach ($b in @(@(150, 230), @(190, 210), @(230, 245), @(1380, 250), @(1415, 23
 Save 'sky.svg' $sb.ToString()
 
 # =================== MOUNTAINS (1600x360) ===================
+# Few soft peaks of clearly different heights, shaded on the right and hatched like a pencil drawing.
 # Peaks must stay in the top ~120 units: on wide screens the lower part is hidden behind the land.
-function Ridge($minY, $maxY, $stepMin, $stepMax) {
-  $pts = @(); $x = -60
-  while ($x -lt 1700) {
-    $pts += ,@($x, (Rand $minY $maxY))
-    $x += Rand $stepMin $stepMax
-    $pts += ,@($x, (Rand ($maxY + 30) ($maxY + 70)))
-    $x += Rand ($stepMin * 0.6) ($stepMax * 0.6)
+function Ridge($peaks, $valleyMin, $valleyMax) {
+  # $peaks: list of @(x, y). A valley is placed between every two peaks.
+  $pts = @(,@(-200, (Rand $valleyMin $valleyMax)))
+  for ($i = 0; $i -lt $peaks.Count; $i++) {
+    $pts += ,$peaks[$i]
+    $nextX = if ($i -lt $peaks.Count - 1) { $peaks[$i + 1][0] } else { 1800 }
+    $pts += ,@((($peaks[$i][0] + $nextX) / 2 + (Rand -40 40)), (Rand $valleyMin $valleyMax))
   }
   return ,$pts
 }
 function RidgePath($pts) {
-  $d = 'M-60 360 '
-  foreach ($p in $pts) { $d += "L$(F $p[0]) $(F $p[1]) " }
-  return $d + 'L1700 360 Z'
+  # Smooth curve through the midpoints between points: rounded tops, soft valleys
+  $d = "M-200 360 L$(F $pts[0][0]) $(F $pts[0][1]) "
+  for ($i = 1; $i -lt $pts.Count - 1; $i++) {
+    $mx = ($pts[$i][0] + $pts[$i + 1][0]) / 2; $my = ($pts[$i][1] + $pts[$i + 1][1]) / 2
+    $d += "Q$(F $pts[$i][0]) $(F $pts[$i][1]) $(F $mx) $(F $my) "
+  }
+  $last = $pts[$pts.Count - 1]
+  return $d + "L$(F $last[0]) $(F $last[1]) L1800 360 Z"
 }
 
 $sb = New-Object Text.StringBuilder
 [void]$sb.Append('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 360" preserveAspectRatio="xMidYMin slice">')
 [void]$sb.Append("<defs>$filters<linearGradient id=`"haze`" x1=`"0`" y1=`"0`" x2=`"0`" y2=`"1`"><stop offset=`"0.3`" stop-color=`"#eef4fb`" stop-opacity=`"0`"/><stop offset=`"1`" stop-color=`"#eef4fb`" stop-opacity=`"0.7`"/></linearGradient></defs>")
-[void]$sb.Append('<g filter="url(#brush)">')
 $layers = @(
-  @{ min = 8;  max = 45;  step = @(140, 220); fill = '#bccce9'; shade = '#a9bce0'; snow = $true },
-  @{ min = 40; max = 80;  step = @(120, 190); fill = '#9fb5de'; shade = '#8aa2d3'; snow = $false },
-  @{ min = 72; max = 110; step = @(100, 170); fill = '#869fd0'; shade = '#728cc2'; snow = $false }
+  @{ peaks = @(@(180, 30), @(640, -16), @(1080, 46), @(1460, 4));  vmin = 110; vmax = 140; fill = '#bccce9'; shade = '#a6b9df'; hatch = '#8fa5d3'; snow = $true },
+  @{ peaks = @(@(380, 70), @(900, 40), @(1300, 92));               vmin = 150; vmax = 175; fill = '#93abda'; shade = '#7c95cc'; hatch = '#6880bd'; snow = $false }
 )
+$li = 0
 foreach ($l in $layers) {
-  $pts = Ridge $l.min $l.max $l.step[0] $l.step[1]
-  [void]$sb.Append("<path d=`"$(RidgePath $pts)`" fill=`"$($l.fill)`"/>")
-  # Shadow side of every peak (light comes from the left)
-  for ($i = 0; $i -lt $pts.Count - 1; $i += 2) {
+  $li++
+  $pts = Ridge $l.peaks $l.vmin $l.vmax
+  $ridgeD = RidgePath $pts
+  [void]$sb.Append("<clipPath id=`"ridge$li`"><path d=`"$ridgeD`"/></clipPath>")
+  [void]$sb.Append("<g filter=`"url(#brush)`"><path d=`"$ridgeD`" fill=`"$($l.fill)`"/>")
+  [void]$sb.Append("<g clip-path=`"url(#ridge$li)`">")
+  # Shadow side of every peak (light comes from the left), then pencil hatching inside it
+  for ($i = 1; $i -lt $pts.Count - 1; $i += 2) {
     $p = $pts[$i]; $v = $pts[$i + 1]
-    [void]$sb.Append("<path d=`"M$(F $p[0]) $(F $p[1]) L$(F $v[0]) $(F $v[1]) L$(F ($v[0] - 12)) 360 L$(F ($p[0] + 10)) 360 Z`" fill=`"$($l.shade)`" opacity=`"0.8`"/>")
-    if ($l.snow -and $p[1] -lt 30) {
-      $w = 22
-      [void]$sb.Append("<path d=`"M$(F $p[0]) $(F $p[1]) L$(F ($p[0] + $w)) $(F ($p[1] + 18)) L$(F ($p[0] + 6)) $(F ($p[1] + 13)) L$(F ($p[0] - 6)) $(F ($p[1] + 20)) L$(F ($p[0] - $w*0.8)) $(F ($p[1] + 16)) Z`" fill=`"#f4f8fd`"/>")
+    $sdx = $v[0] - $p[0]
+    # Shadow lies between the right slope and an inner line from the peak down; it ends at the valley
+    [void]$sb.Append("<path d=`"M$(F $p[0]) $(F ($p[1] - 30)) L$(F ($v[0] + 40)) $(F ($v[1] - 40)) L$(F $v[0]) $(F ($v[1] + 6)) L$(F ($v[0] + 70)) 360 L$(F ($p[0] + 0.3*$sdx)) 360 Q$(F ($p[0] + 0.04*$sdx)) $(F (($p[1] + 360) / 2)) $(F $p[0]) $(F $p[1]) Z`" fill=`"$($l.shade)`" opacity=`"0.85`"/>")
+    $dx = $v[0] - $p[0]; $dy = 360 - $p[1]; $len = [Math]::Sqrt($dx*$dx + $dy*$dy)
+    $ux = $dx / $len * 0.55; $uy = $dy / $len
+    for ($j = 0; $j -lt 26; $j++) {
+      $t = Rand 0.05 0.9
+      $sx = $p[0] + ($v[0] - $p[0]) * $t * 0.8 + (Rand 0 40); $sy = $p[1] + (360 - $p[1]) * $t * 0.5
+      $sl = Rand 18 46
+      [void]$sb.Append("<path d=`"M$(F $sx) $(F $sy) l$(F ($ux*$sl)) $(F ($uy*$sl))`" stroke=`"$($l.hatch)`" stroke-width=`"1.3`" stroke-linecap=`"round`" opacity=`"0.45`"/>")
+    }
+    if ($l.snow -and $p[1] -lt 20) {
+      $sx = $p[0]; $sy = $p[1] + 22
+      [void]$sb.Append("<path d=`"M$(F ($sx - 90)) $(F ($sy - 60)) L$(F ($sx + 90)) $(F ($sy - 60)) L$(F ($sx + 52)) $(F ($sy + 18)) L$(F ($sx + 26)) $(F ($sy + 8)) L$(F ($sx + 6)) $(F ($sy + 24)) L$(F ($sx - 18)) $(F ($sy + 10)) L$(F ($sx - 44)) $(F ($sy + 20)) Z`" fill=`"#f4f8fd`" opacity=`"0.95`"/>")
     }
   }
+  [void]$sb.Append('</g></g>')
 }
-[void]$sb.Append('</g><rect width="1600" height="360" fill="url(#haze)"/></svg>')
+[void]$sb.Append('<rect width="1600" height="360" fill="url(#haze)"/></svg>')
 Save 'mountains.svg' $sb.ToString()
 
 # =================== LAND (1600x420) ===================
@@ -176,26 +196,6 @@ foreach ($t in @(0.25, 0.75)) {
   }
 }
 
-# Tiny people walking and running on the path
-$clothes = @('#ef8d88', '#ffd6a5', '#5b8fd6', '#bdb2ff', '#ffadad', '#fdffb6', '#ffffff', '#e8675b', '#14a89b')
-$skins = @('#f1c8a8', '#d9a882', '#b98462')
-$people = @(@(1, 0.12, -8), @(1, 0.4, 6), @(1, 0.62, -4), @(1, 0.9, 7), @(2, 0.2, -6), @(2, 0.38, 5), @(2, 0.55, -7), @(2, 0.78, 4), @(2, 0.92, -3))
-foreach ($pp in $people) {
-  $seg = if ($pp[0] -eq 1) { $seg1 } else { $seg2 }
-  $p = Bez $seg[0] $seg[1] $seg[2] $seg[3] $pp[1]
-  $k = 0.45 + $p[1] / 420
-  $x = $p[0] + $pp[2] * $k; $y = $p[1] + 4 * $k
-  $dir = Pick @(-1, 1)
-  $shirt = Pick $clothes; $pants = Pick @('#3a3f55', '#2f3b66', '#5a4a6e', '#3a3f55')
-  [void]$sb.Append("<g transform=`"translate($(F $x) $(F $y)) scale($(F ($k*$dir)) $(F $k))`" stroke-linecap=`"round`">")
-  [void]$sb.Append('<ellipse cx="0" cy="0" rx="6" ry="1.6" fill="#556b7a" opacity="0.3"/>')
-  [void]$sb.Append("<path d=`"M0 -10 L-4 0 M0 -10 L4 -2 L6 0`" stroke=`"$pants`" stroke-width=`"2.6`" fill=`"none`"/>")
-  [void]$sb.Append("<path d=`"M-1 -18 L-5 -12 M1 -18 L5 -14`" stroke=`"$(Pick $skins)`" stroke-width=`"1.8`" fill=`"none`"/>")
-  [void]$sb.Append("<rect x=`"-3`" y=`"-20`" width=`"6`" height=`"10`" rx=`"2.5`" fill=`"$shirt`"/>")
-  [void]$sb.Append("<circle cx=`"0.5`" cy=`"-23.5`" r=`"3`" fill=`"$(Pick $skins)`"/>")
-  [void]$sb.Append("<path d=`"M-2.8 -24 a3 3 0 0 1 6 -1`" fill=`"$(Pick @('#3a2a22', '#6b4a2e', '#e8c26a', '#2a2a4a'))`"/>")
-  [void]$sb.Append('</g>')
-}
 [void]$sb.Append('</svg>')
 Save 'land.svg' $sb.ToString()
 
@@ -226,32 +226,79 @@ for ($i = 0; $i -lt 230; $i++) {
 Save 'water.svg' $sb.ToString()
 
 # =================== TREES ===================
+# Trunk forks into curved limbs that taper towards the tips; every limb and twig ends in a
+# clump of leaves. Gaps between clumps let the limbs show through, like in the reference.
+# The trunk base goes into the ground: root flare plus grass blades drawn over it.
 $leafShades = @('#d0e45e', '#9ccb45', '#68ab3d', '#438e3b', '#2f6e35')  # light -> dark
-function Tree($name, $w, $h, $foliage, $trunkTop, $branches) {
+
+# Filled tapering curve (quadratic Bezier) from width $w0 to width $w1
+function Limb($x0, $y0, $qx, $qy, $x1, $y1, $w0, $w1) {
+  $left = @(); $right = @()
+  for ($i = 0; $i -le 12; $i++) {
+    $t = $i / 12; $u = 1 - $t
+    $px = $u*$u*$x0 + 2*$u*$t*$qx + $t*$t*$x1
+    $py = $u*$u*$y0 + 2*$u*$t*$qy + $t*$t*$y1
+    $dx = 2*$u*($qx - $x0) + 2*$t*($x1 - $qx); $dy = 2*$u*($qy - $y0) + 2*$t*($y1 - $qy)
+    $len = [Math]::Max(0.001, [Math]::Sqrt($dx*$dx + $dy*$dy))
+    $nx = -$dy / $len; $ny = $dx / $len
+    $hw = ($w0 + ($w1 - $w0) * $t) / 2
+    $left += "$(F ($px + $nx*$hw)) $(F ($py + $ny*$hw))"
+    $right = @("$(F ($px - $nx*$hw)) $(F ($py - $ny*$hw))") + $right
+  }
+  return 'M' + (($left + $right) -join ' L') + ' Z'
+}
+
+function Tree($name, $w, $h, $trunkW, $forkY, $limbs, $clumpR) {
   $sb = New-Object Text.StringBuilder
   [void]$sb.Append("<svg xmlns=`"http://www.w3.org/2000/svg`" viewBox=`"0 0 $w $h`">")
   [void]$sb.Append("<defs>$filters</defs>")
-  $cx = $w / 2; $ground = $h - 10
-  # Shadow on the grass
-  [void]$sb.Append("<ellipse cx=`"$(F ($cx + 8))`" cy=`"$(F $ground)`" rx=`"$(F ($w*0.36))`" ry=`"$(F 8)`" fill=`"#2f5e2f`" opacity=`"0.35`"/>")
-  # Trunk and branches
-  [void]$sb.Append('<g stroke="#5a3d2e" stroke-linecap="round" fill="none" filter="url(#brush)">')
-  [void]$sb.Append("<path d=`"M$(F $cx) $(F $ground) C$(F ($cx - 4)) $(F ($ground - 40)) $(F ($cx + 6)) $(F ($trunkTop + 30)) $(F $cx) $(F $trunkTop)`" stroke-width=`"$(F ($w*0.07))`"/>")
-  foreach ($b in $branches) {
-    [void]$sb.Append("<path d=`"M$(F $cx) $(F $b[0]) Q$(F ($cx + $b[1]*0.5)) $(F ($b[0] - 10)) $(F ($cx + $b[1])) $(F ($b[0] + $b[2]))`" stroke-width=`"$(F ($w*0.03))`"/>")
+  $cx = $w / 2; $ground = $h - 12
+  $forkX = $cx + (Rand -4 4)
+
+  # Shadow of the crown on the grass, tight at the trunk
+  [void]$sb.Append("<ellipse cx=`"$(F ($cx + 10))`" cy=`"$(F ($ground + 2))`" rx=`"$(F ($w*0.34))`" ry=`"7`" fill=`"#2f5e2f`" opacity=`"0.28`"/>")
+  [void]$sb.Append("<ellipse cx=`"$(F ($cx + 3))`" cy=`"$(F ($ground + 2))`" rx=`"$(F ($trunkW*1.4))`" ry=`"3.5`" fill=`"#24452a`" opacity=`"0.45`"/>")
+
+  # Trunk, root flare, limbs and twigs
+  $wood = New-Object Text.StringBuilder
+  [void]$wood.Append("<path d=`"$(Limb $cx ($ground + 6) ($cx - 5) (($ground + $forkY) / 2) $forkX $forkY $trunkW ($trunkW*0.72))`"/>")
+  foreach ($s in @(-1, 1)) {
+    [void]$wood.Append("<path d=`"$(Limb $cx ($ground - 14) ($cx + $s*$trunkW*0.4) ($ground - 2) ($cx + $s*$trunkW*1.05) ($ground + 5) ($trunkW*0.55) 2)`"/>")
   }
-  [void]$sb.Append('</g>')
-  # Foliage: dark base, then leaf blobs, lighter towards the upper left
+  $tips = @()
+  foreach ($l in $limbs) {
+    $ex = $cx + $l[0]; $ey = $l[1]
+    $qx = $forkX + ($ex - $forkX) * 0.2; $qy = $forkY + ($ey - $forkY) * 0.75
+    [void]$wood.Append("<path d=`"$(Limb $forkX ($forkY + 6) $qx $qy $ex $ey ($trunkW*0.55) ($trunkW*0.16))`"/>")
+    $tips += ,@($ex, $ey, 1.0)
+    # One twig from the middle of the limb, pointing outwards and up
+    $mx = 0.25*$forkX + 0.5*$qx + 0.25*$ex; $my = 0.25*$forkY + 0.5*$qy + 0.25*$ey
+    $side = if ($l[0] -lt 0) { -1 } else { 1 }
+    $tx = $mx + $side * (Rand 18 30); $ty = $my - (Rand 14 26)
+    [void]$wood.Append("<path d=`"$(Limb $mx $my ($mx + $side*6) ($my - 10) $tx $ty ($trunkW*0.26) ($trunkW*0.08))`"/>")
+    $tips += ,@($tx, $ty, 0.75)
+  }
+  [void]$sb.Append("<g fill=`"#5a3d2e`" filter=`"url(#brush)`">$($wood.ToString())</g>")
+  # Light side of the trunk: a thin tapering strip following the trunk curve
+  [void]$sb.Append("<path d=`"$(Limb ($cx - $trunkW*0.25) ($ground - 2) ($cx - 5 - $trunkW*0.25) (($ground + $forkY) / 2) ($forkX - $trunkW*0.2) ($forkY + 8) ($trunkW*0.22) ($trunkW*0.06))`" fill=`"#7d5a44`" opacity=`"0.55`" filter=`"url(#brush)`"/>")
+
+  # Leaf clumps at every tip, plus one on top between the upper limbs
+  $top = ($tips | ForEach-Object { $_[1] } | Measure-Object -Minimum).Minimum
+  $tips += ,@(($forkX + (Rand -6 6)), ($top - $clumpR*0.5), 1.0)
+  $top = $top - $clumpR*0.5
+  $span = [Math]::Max(1, $forkY - $top)
   $blobs = @()
-  foreach ($f in $foliage) {
-    [void]$sb.Append("<ellipse cx=`"$(F $f[0])`" cy=`"$(F $f[1])`" rx=`"$(F ($f[2]*0.85))`" ry=`"$(F ($f[3]*0.85))`" fill=`"#2f6e35`" filter=`"url(#brush)`"/>")
-    for ($i = 0; $i -lt 70; $i++) {
+  foreach ($tp in $tips) {
+    $r = $clumpR * $tp[2]
+    [void]$sb.Append("<ellipse cx=`"$(F $tp[0])`" cy=`"$(F $tp[1])`" rx=`"$(F ($r*0.92))`" ry=`"$(F ($r*0.78))`" fill=`"#2f6e35`" filter=`"url(#brush)`"/>")
+    $low = ($tp[1] - $top) / $span  # 0 at the top of the crown, 1 at the fork
+    for ($i = 0; $i -lt 46; $i++) {
       $ang = Rand 0 (2 * [Math]::PI); $rad = [Math]::Sqrt($rnd.NextDouble())
       $dx = [Math]::Cos($ang) * $rad; $dy = [Math]::Sin($ang) * $rad
-      $t = $dx * 0.45 + $dy * 0.75
-      $idx = [Math]::Floor((($t + 1) / 2) * 5 + (Rand -0.9 0.9))
+      $t = $dx * 0.4 + $dy * 0.7 + $low * 0.8 - 0.05
+      $idx = [Math]::Floor((($t + 1) / 2) * 5 + (Rand -0.8 0.8))
       $idx = [Math]::Max(0, [Math]::Min(4, $idx))
-      $blobs += ,@(($f[0] + $dx * $f[2]), ($f[1] + $dy * $f[3]), (Rand ($f[2]*0.14) ($f[2]*0.26)), $idx)
+      $blobs += ,@(($tp[0] + $dx * $r), ($tp[1] + $dy * $r * 0.8), (Rand ($r*0.2) ($r*0.36)), $idx)
     }
   }
   [void]$sb.Append('<g filter="url(#brush)">')
@@ -259,19 +306,70 @@ function Tree($name, $w, $h, $foliage, $trunkTop, $branches) {
     [void]$sb.Append("<ellipse cx=`"$(F $bl[0])`" cy=`"$(F $bl[1])`" rx=`"$(F $bl[2])`" ry=`"$(F ($bl[2]*0.8))`" fill=`"$($leafShades[$bl[3]])`"/>")
   }
   [void]$sb.Append('</g>')
-  # A few branches visible through the leaves
-  [void]$sb.Append('<g stroke="#4a3328" stroke-linecap="round" fill="none" opacity="0.85">')
-  foreach ($b in $branches) {
-    $ex = $cx + $b[1] * 0.8; $ey = $b[0] - 6
-    [void]$sb.Append("<path d=`"M$(F ($cx + $b[1]*0.3)) $(F ($b[0] - 2)) L$(F $ex) $(F $ey)`" stroke-width=`"$(F ($w*0.018))`"/>")
+
+  # Grass growing over the trunk base, so the tree stands in the meadow
+  [void]$sb.Append('<g stroke-linecap="round">')
+  for ($i = 0; $i -lt 40; $i++) {
+    $gx = $cx + (Rand (-$trunkW*2.2) ($trunkW*2.2)); $gy = $ground + (Rand 1 7)
+    $a = (Rand -120 -60) * [Math]::PI / 180; $gl = Rand 5 11
+    [void]$sb.Append("<path d=`"M$(F $gx) $(F $gy) l$(F ([Math]::Cos($a)*$gl)) $(F ([Math]::Sin($a)*$gl))`" stroke=`"$(Pick @('#5d9b3c', '#6fae3f', '#86c34f', '#a9d24e'))`" stroke-width=`"2`"/>")
   }
   [void]$sb.Append('</g></svg>')
   Save $name $sb.ToString()
 }
 
-# Big round tree
-Tree 'tree-1.svg' 200 240 @(@(100, 92, 84, 72), @(58, 110, 46, 40), @(146, 112, 48, 40), @(100, 52, 56, 44)) 150 @(@(160, -50, -30), @(150, 54, -34), @(128, -26, -40))
+# =================== MEME CLOUD (map object, 320x160) ===================
+# Three round puffs stuck together, the middle one in front. Every puff is a rosette of
+# lobes; each lobe is a white ball with a bluish rim, which gives the scalloped edge.
+$sb = New-Object Text.StringBuilder
+[void]$sb.Append('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 160">')
+[void]$sb.Append(@'
+<defs>
+  <radialGradient id="lobe" cx="0.5" cy="0.5" r="0.5" fx="0.4" fy="0.34">
+    <stop offset="0" stop-color="#ffffff"/>
+    <stop offset="0.6" stop-color="#ffffff"/>
+    <stop offset="0.84" stop-color="#f1f5fc"/>
+    <stop offset="0.96" stop-color="#d4e1f5"/>
+    <stop offset="1" stop-color="#c3d5f1"/>
+  </radialGradient>
+  <filter id="pencil" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9 0.12" numOctaves="2" seed="2" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.66  0 0 0 0 0.88  0 0 0 0.3 0" result="tint"/>
+    <feComposite in="tint" in2="SourceAlpha" operator="in" result="tex"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="6" result="warp"/>
+    <feDisplacementMap in="SourceGraphic" in2="warp" scale="3" result="shape"/>
+    <feMerge><feMergeNode in="shape"/><feMergeNode in="tex"/></feMerge>
+  </filter>
+</defs>
+<g filter="url(#pencil)">
+'@)
+function Puff($pcx, $pcy, $R) {
+  $lobes = @()
+  for ($i = 0; $i -lt 9; $i++) {
+    $a = $i / 9 * 2 * [Math]::PI + (Rand -0.15 0.15)
+    $lobes += ,@(($pcx + [Math]::Cos($a) * $R * 0.6), ($pcy + [Math]::Sin($a) * $R * 0.56), ($R * (Rand 0.38 0.46)))
+  }
+  # Upper lobes first, lower ones overlap them
+  $out = ''
+  foreach ($l in ($lobes | Sort-Object { $_[1] })) {
+    $out += "<circle cx=`"$(F $l[0])`" cy=`"$(F $l[1])`" r=`"$(F $l[2])`" fill=`"url(#lobe)`"/>"
+  }
+  for ($i = 0; $i -lt 5; $i++) {
+    $a = $i / 5 * 2 * [Math]::PI + 0.3
+    $out += "<circle cx=`"$(F ($pcx + [Math]::Cos($a) * $R * 0.28))`" cy=`"$(F ($pcy + [Math]::Sin($a) * $R * 0.26))`" r=`"$(F ($R * 0.36))`" fill=`"url(#lobe)`"/>"
+  }
+  $out += "<circle cx=`"$(F ($pcx - $R*0.04))`" cy=`"$(F ($pcy - $R*0.06))`" r=`"$(F ($R * 0.32))`" fill=`"url(#lobe)`"/>"
+  return $out
+}
+[void]$sb.Append((Puff 82 92 48))
+[void]$sb.Append((Puff 240 94 46))
+[void]$sb.Append((Puff 160 78 64))
+[void]$sb.Append('</g></svg>')
+Save 'cloud.svg' $sb.ToString()
+
+# Big round tree: limbs as @(x offset from the centre, y of the tip)
+Tree 'tree-1.svg' 200 240 16 150 @(@(-70, 98), @(68, 90), @(-30, 60), @(32, 52)) 25
 # Tall tree
-Tree 'tree-2.svg' 150 260 @(@(75, 96, 60, 84), @(75, 60, 44, 50), @(48, 140, 32, 30), @(104, 136, 32, 30)) 170 @(@(180, -40, -40), @(168, 40, -44))
+Tree 'tree-2.svg' 150 260 13 170 @(@(-44, 124), @(42, 108), @(-14, 70), @(18, 86)) 21
 # Small bushy tree
-Tree 'tree-3.svg' 160 150 @(@(80, 66, 66, 50), @(42, 82, 36, 30), @(120, 84, 36, 30)) 100 @(@(108, -34, -22), @(104, 36, -24))
+Tree 'tree-3.svg' 160 150 11 102 @(@(-50, 70), @(50, 64), @(2, 46)) 21

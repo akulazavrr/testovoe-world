@@ -40,8 +40,8 @@
 }
 
 .map__subtitle {
-  max-width: 38em;
   margin: 8px auto 0;
+  line-height: 1.3;
   text-wrap: balance;
 }
 
@@ -104,12 +104,13 @@
   transform: translate(-50%, -96%);
 }
 
-.tree--a { --x: 7%;  --y: 64%; --h: min(28vh, 38vw); }
-.tree--b { --x: 20%; --y: 54%; --h: min(22vh, 30vw); }
+/* Деревья стоят на траве, не ближе к воде, чем 60% (вода начинается с 64%) */
+.tree--a { --x: 7%;  --y: 60%; --h: min(28vh, 38vw); }
+.tree--b { --x: 20%; --y: 53%; --h: min(22vh, 30vw); }
 .tree--c { --x: 31%; --y: 45%; --h: min(9vh, 15vw); }
 .tree--d { --x: 69%; --y: 44%; --h: min(9vh, 15vw); }
-.tree--e { --x: 82%; --y: 53%; --h: min(22vh, 30vw); }
-.tree--f { --x: 94%; --y: 65%; --h: min(28vh, 38vw); }
+.tree--e { --x: 82%; --y: 52%; --h: min(22vh, 30vw); }
+.tree--f { --x: 94%; --y: 60%; --h: min(28vh, 38vw); }
 
 /* ---------- Объекты-кнопки ---------- */
 
@@ -162,17 +163,21 @@
   width: 100%;
 }
 
+/* Подпись: аккуратный белый текст без плашки. Мягкая тёмная тень
+   нужна, чтобы белое читалось и на небе, и на траве, и на воде. */
 .map-object__label {
   width: max-content;
-  max-width: 10em;
-  padding: 2px 12px;
-  border-radius: 999px;
-  background: var(--c-white);
+  max-width: 11em;
+  color: var(--c-white);
+  font-size: 14px;
   font-weight: 700;
-  line-height: 1.25;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
   text-align: center;
   text-wrap: balance;
-  box-shadow: 0 3px 10px rgba(28, 52, 60, 0.2);
+  text-shadow:
+    0 1px 2px rgba(20, 36, 60, 0.7),
+    0 0 10px rgba(20, 36, 60, 0.45);
 }
 
 /* Расположение и размеры. Размер зависит и от ширины, и от высоты
@@ -181,7 +186,7 @@
 .map-object--memes {
   --x: 50%;
   --y: 15%;
-  --w: min(52vw, 32vh);
+  --w: min(64vw, 38vh);
 }
 
 .map-object--house {
@@ -214,15 +219,39 @@
   to   { transform: translateX(6%); }
 }
 
-/* Домик покачивается */
+/* Домик стоит на земле и слегка «дышит»: увеличивается от основания.
+   Анимируется свойство scale, а не transform, чтобы при наведении
+   transform на картинке мог добавить своё увеличение. */
 .map-object__art--house {
+  filter: none; /* без парящей тени: своя тень нарисована у основания */
   transform-origin: 50% 100%;
-  animation: sway 5s ease-in-out infinite alternate;
+  animation: breathe 3.6s ease-in-out infinite alternate;
+  transition: transform 200ms var(--ease);
 }
 
-@keyframes sway {
-  from { transform: rotate(-1.5deg); }
-  to   { transform: rotate(1.5deg); }
+@keyframes breathe {
+  from { scale: 1; }
+  to   { scale: 1.035; }
+}
+
+/* При наведении домик растёт от основания, а не от центра кнопки,
+   поэтому не отрывается от земли */
+@media (hover: hover) {
+  .map-object--house:hover {
+    transform: translate(-50%, -50%);
+  }
+
+  .map-object--house:hover .map-object__art--house {
+    transform: scale(var(--hover-scale));
+  }
+}
+
+.map-object--house:focus-visible {
+  transform: translate(-50%, -50%);
+}
+
+.map-object--house:focus-visible .map-object__art--house {
+  transform: scale(var(--hover-scale));
 }
 
 /* Айсберг качается на воде */
@@ -250,7 +279,7 @@
 
 .kilka-tomato {
   position: absolute;
-  width: 22% !important;
+  width: 24% !important;
   animation: hover-float 2.4s ease-in-out infinite;
 }
 
@@ -276,9 +305,10 @@
 
   .map-object__label {
     max-width: 13em;
+    font-size: 16px;
   }
 
-  .map-object--memes   { --w: min(40vw, 34vh); --y: 16%; }
+  .map-object--memes   { --w: min(46vw, 40vh); --y: 16%; }
   .map-object--house   { --w: min(26vw, 22vh); }
   .map-object--iceberg { --w: min(22vw, 21vh); --x: 26%; }
   .map-object--kilka   { --w: min(30vw, 27vh); --x: 72%; }
@@ -296,6 +326,11 @@
   .map-object:hover,
   .map-object:focus-visible {
     transform: translate(-50%, -50%);
+  }
+
+  .map-object--house:hover .map-object__art--house,
+  .map-object--house:focus-visible .map-object__art--house {
+    transform: none;
   }
 
   .map-object:hover {
