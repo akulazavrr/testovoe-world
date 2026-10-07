@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" preserveAspectRatio="none">
+  <!-- Фон: вода -->
+  <path d="M0 30 C80 10 160 10 250 30 C340 50 420 50 500 30 C580 10 660 10 750 30 C840 50 920 50 1000 30 L1000 300 L0 300 Z" fill="#14d1c1"/>
+  <g fill="none" stroke="#9bf6ff" stroke-width="5" stroke-linecap="round">
+    <path d="M60 110 C90 100 120 100 150 110"/>
+    <path d="M420 150 C450 140 480 140 510 150"/>
+    <path d="M820 120 C850 110 880 110 910 120"/>
+    <path d="M220 230 C250 220 280 220 310 230"/>
+    <path d="M640 250 C670 240 700 240 730 250"/>
+  </g>
+</svg>

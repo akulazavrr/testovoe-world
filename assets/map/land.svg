@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" preserveAspectRatio="none">
+  <!-- Фон: суша -->
+  <path d="M0 70 C150 30 300 40 420 60 C560 84 700 30 840 40 C920 46 970 60 1000 66 L1000 300 L0 300 Z" fill="#caffbf"/>
+</svg>

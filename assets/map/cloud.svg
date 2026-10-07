@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 100">
+  <!-- Заглушка: «Мемное облако», два слипшихся облака -->
+  <defs>
+    <g id="right">
+      <circle cx="122" cy="56" r="20"/>
+      <circle cx="148" cy="40" r="25"/>
+      <circle cx="174" cy="56" r="18"/>
+      <rect x="104" y="52" width="86" height="30" rx="15"/>
+    </g>
+    <g id="left">
+      <circle cx="40" cy="62" r="22"/>
+      <circle cx="70" cy="42" r="30"/>
+      <circle cx="102" cy="58" r="22"/>
+      <rect x="18" y="58" width="106" height="30" rx="15"/>
+    </g>
+  </defs>
+  <!-- Контур рисуется расширенной тёмной копией под заливкой -->
+  <use xlink:href="#right" fill="#2a2a4a" stroke="#2a2a4a" stroke-width="7"/>
+  <use xlink:href="#right" fill="#ffc6ff"/>
+  <use xlink:href="#left" fill="#2a2a4a" stroke="#2a2a4a" stroke-width="7"/>
+  <use xlink:href="#left" fill="#ffffff"/>
+</svg>

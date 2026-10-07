@@ -1,0 +1,206 @@
+/* Общие переменные, типографика и компоненты */
+
+:root {
+  /* Палитра */
+  --c-coral: #ef8d88;    /* акценты, томаты */
+  --c-pink: #ffadad;
+  --c-peach: #ffd6a5;    /* тёплые детали */
+  --c-lemon: #fdffb6;    /* тёплые детали */
+  --c-mint: #caffbf;     /* суша */
+  --c-teal: #14d1c1;     /* вода */
+  --c-sky: #9bf6ff;      /* небо */
+  --c-blue: #a0c4ff;     /* небо */
+  --c-lavender: #bdb2ff; /* глубина */
+  --c-candy: #ffc6ff;    /* облака */
+
+  /* Тёмные оттенки глубины: смесь лавандового и тёмного текстового.
+     Нужны там, где на фоне набирается белый текст. */
+  --c-deep-1: #6f66b8;
+  --c-deep-2: #463f86;
+  --c-deep-3: #2a2a4a;
+
+  --c-text: #2a2a4a;
+  --c-white: #ffffff;
+
+  /* Шрифты */
+  --font-heading: 'Unbounded', 'Arial Black', sans-serif;
+  --font-body: 'Nunito', 'Segoe UI', Arial, sans-serif;
+
+  /* Размеры */
+  --text-size: 16px;
+  --gutter: 16px;
+  --radius: 16px;
+  --outline: 3px solid var(--c-text);
+
+  /* Анимации */
+  --overlay-duration: 250ms; /* должно совпадать с OVERLAY_DURATION_MS в js/main.js */
+  --ease: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --text-size: 18px;
+    --gutter: 32px;
+  }
+}
+
+/* ---------- Сброс и основа ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-size);
+  line-height: 1.5;
+  color: var(--c-text);
+  background: var(--c-blue);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Пока раздел открыт, страница под ним не скроллится */
+body.is-locked {
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: var(--outline);
+  outline-offset: 4px;
+}
+
+/* Скрыть визуально, оставить для скринридеров */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Слой разделов ---------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity var(--overlay-duration) var(--ease);
+}
+
+.overlay.is-open {
+  opacity: 1;
+}
+
+.overlay[hidden] {
+  display: none;
+}
+
+/* Каждый раздел скроллится сам по себе */
+.section {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--c-white);
+}
+
+.section[hidden] {
+  display: none;
+}
+
+.section__inner {
+  max-width: 960px;
+  margin: 0 auto;
+  /* Сверху место под закреплённую кнопку возврата */
+  padding: 96px var(--gutter) 64px;
+}
+
+.section__title {
+  font-size: clamp(1.75rem, 1.2rem + 2.5vw, 3rem);
+}
+
+.section__title:focus {
+  outline: none;
+}
+
+.section__stub {
+  margin-top: 16px;
+}
+
+/* ---------- Кнопка возврата на карту (одна на все разделы) ---------- */
+
+.back-button {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  left: max(var(--gutter), env(safe-area-inset-left));
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 20px;
+  border: 2px solid var(--c-text);
+  border-radius: 999px;
+  background: var(--c-white);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--c-text);
+  transition: transform 150ms var(--ease), box-shadow 150ms var(--ease);
+}
+
+.back-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--c-text);
+}
+
+.back-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--c-text);
+}
+
+/* ---------- Меньше движения ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

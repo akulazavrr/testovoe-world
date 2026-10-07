@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" preserveAspectRatio="none">
+  <!-- Фон: горы на заднем плане -->
+  <path d="M0 210 L120 120 L230 190 L380 40 L520 170 L640 90 L780 180 L900 70 L1000 140 L1000 300 L0 300 Z" fill="#ffc6ff"/>
+  <path d="M0 250 L160 150 L300 230 L470 110 L610 220 L760 140 L900 230 L1000 180 L1000 300 L0 300 Z" fill="#bdb2ff"/>
+</svg>

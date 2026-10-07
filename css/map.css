@@ -1,0 +1,262 @@
+/* Главная карта. Помещается в один экран, без скролла.
+   Сверху вниз: заголовок, небо, горы, суша, вода. */
+
+.map {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh; /* на телефонах учитывает панели браузера */
+  overflow: hidden;
+  /* Небо — фон всей карты */
+  background: linear-gradient(180deg, var(--c-blue) 0%, var(--c-sky) 55%);
+}
+
+/* ---------- Заголовок ---------- */
+
+.map__header {
+  position: relative;
+  z-index: 2;
+  padding: max(20px, env(safe-area-inset-top)) var(--gutter) 0;
+  text-align: center;
+}
+
+.map__title {
+  font-size: clamp(1.375rem, 0.9rem + 2.4vw, 3.25rem);
+}
+
+.map__subtitle {
+  max-width: 38em;
+  margin: 8px auto 0;
+  text-wrap: balance;
+}
+
+/* ---------- Мир: фон и объекты ----------
+   Всё внутри позиционируется в процентах от этого блока,
+   поэтому расположение сохраняется на любой ширине. */
+
+.map__world {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.layer {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+
+.layer--mountains {
+  top: 20%;
+  height: 30%;
+  background-image: url('../assets/map/mountains.svg');
+}
+
+.layer--land {
+  top: 38%;
+  height: 40%;
+  background-image: url('../assets/map/land.svg');
+}
+
+.layer--water {
+  top: 64%;
+  bottom: 0;
+  background-image: url('../assets/map/water.svg');
+}
+
+/* ---------- Объекты-кнопки ---------- */
+
+.map-object {
+  /* Положение центра объекта, задаётся у каждого ниже */
+  --x: 50%;
+  --y: 50%;
+  --w: 120px;
+  --hover-scale: 1.06;
+
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: var(--w);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transform: translate(-50%, -50%);
+  transition: transform 200ms var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .map-object:hover {
+    transform: translate(-50%, -50%) scale(var(--hover-scale));
+  }
+}
+
+.map-object:focus-visible {
+  transform: translate(-50%, -50%) scale(var(--hover-scale));
+  outline-offset: 6px;
+}
+
+.map-object__art {
+  position: relative;
+  display: block;
+  width: 100%;
+  /* Мягкая тень отделяет объект от фона */
+  filter: drop-shadow(0 6px 6px rgba(42, 42, 74, 0.25));
+}
+
+.map-object__art img {
+  width: 100%;
+}
+
+.map-object__label {
+  width: max-content;
+  max-width: 10em;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--c-white);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+  box-shadow: 0 2px 0 rgba(42, 42, 74, 0.2);
+}
+
+/* Расположение и размеры. Размер зависит и от ширины, и от высоты
+   экрана, чтобы карта всегда помещалась без скролла. */
+
+.map-object--memes {
+  --x: 50%;
+  --y: 15%;
+  --w: min(52vw, 32vh);
+}
+
+.map-object--house {
+  --x: 50%;
+  --y: 46%;
+  --w: min(32vw, 19vh);
+}
+
+.map-object--iceberg {
+  --x: 28%;
+  --y: 78%;
+  --w: min(30vw, 18vh);
+}
+
+.map-object--kilka {
+  --x: 73%;
+  --y: 77%;
+  --w: min(40vw, 23vh);
+}
+
+/* ---------- Постоянное движение: у каждого объекта своё ---------- */
+
+/* Облако дрейфует */
+.map-object__art--cloud {
+  animation: drift 9s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from { transform: translateX(-6%); }
+  to   { transform: translateX(6%); }
+}
+
+/* Домик покачивается */
+.map-object__art--house {
+  transform-origin: 50% 100%;
+  animation: sway 5s ease-in-out infinite alternate;
+}
+
+@keyframes sway {
+  from { transform: rotate(-1.5deg); }
+  to   { transform: rotate(1.5deg); }
+}
+
+/* Айсберг качается на воде */
+.map-object__art--iceberg {
+  animation: bob 4.2s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50%      { transform: translateY(5%) rotate(1.5deg); }
+}
+
+/* Килька и томаты парят вверх-вниз, каждый в своём ритме */
+.map-object__art--kilka {
+  aspect-ratio: 3 / 2;
+}
+
+.kilka-fish {
+  position: absolute;
+  left: 12%;
+  top: 18%;
+  width: 76% !important;
+  animation: hover-float 3s ease-in-out infinite;
+}
+
+.kilka-tomato {
+  position: absolute;
+  width: 22% !important;
+  animation: hover-float 2.4s ease-in-out infinite;
+}
+
+.kilka-tomato--1 { left: 0;   top: 0;   animation-duration: 2.6s; }
+.kilka-tomato--2 { left: 74%; top: 2%;  animation-duration: 3.4s; animation-delay: -1s; }
+.kilka-tomato--3 { left: 62%; top: 66%; animation-duration: 2.9s; animation-delay: -2s; }
+
+@keyframes hover-float {
+  0%, 100% { transform: translateY(-6%); }
+  50%      { transform: translateY(6%); }
+}
+
+/* ---------- Десктоп: объекты крупнее, расстояния больше ---------- */
+
+@media (min-width: 768px) {
+  .map__header {
+    padding-top: max(32px, env(safe-area-inset-top));
+  }
+
+  .map__subtitle {
+    margin-top: 12px;
+  }
+
+  .map-object__label {
+    max-width: 13em;
+  }
+
+  .map-object--memes   { --w: min(40vw, 34vh); --y: 16%; }
+  .map-object--house   { --w: min(26vw, 22vh); }
+  .map-object--iceberg { --w: min(22vw, 21vh); --x: 26%; }
+  .map-object--kilka   { --w: min(30vw, 27vh); --x: 72%; }
+}
+
+/* ---------- Меньше движения ----------
+   Объекты стоят на месте, при наведении выделяются контуром. */
+
+@media (prefers-reduced-motion: reduce) {
+  .map-object__art,
+  .map-object__art img {
+    animation: none !important;
+  }
+
+  .map-object:hover,
+  .map-object:focus-visible {
+    transform: translate(-50%, -50%);
+  }
+
+  .map-object:hover {
+    outline: 3px dashed var(--c-text);
+    outline-offset: 6px;
+  }
+}

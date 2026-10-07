@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 130">
+  <!-- Заглушка: «Айсберг вирусного спеца». Малая часть над водой, большая под водой -->
+  <g stroke="#2a2a4a" stroke-width="3" stroke-linejoin="round">
+    <path d="M14 54 L104 54 L116 84 L94 120 L42 126 L6 92 Z" fill="#bdb2ff" fill-opacity="0.75"/>
+    <path d="M18 54 L42 18 L56 28 L72 6 L102 54 Z" fill="#ffffff"/>
+  </g>
+  <path d="M0 54 Q10 49 20 54 T40 54 T60 54 T80 54 T100 54 T120 54" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+</svg>
