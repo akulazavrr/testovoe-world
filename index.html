@@ -16,7 +16,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#a0c4ff">
+  <meta name="theme-color" content="#86aee0">
 
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="apple-touch-icon" href="assets/favicon.png">
@@ -49,24 +49,34 @@
       <div class="layer layer--land" aria-hidden="true"></div>
       <div class="layer layer--water" aria-hidden="true"></div>
 
+      <!-- Деревья: неподвижное наполнение мира -->
+      <div class="decor" aria-hidden="true">
+        <img class="tree tree--a" src="assets/map/tree-1.svg" alt="" width="200" height="240">
+        <img class="tree tree--b" src="assets/map/tree-2.svg" alt="" width="150" height="260">
+        <img class="tree tree--c" src="assets/map/tree-3.svg" alt="" width="160" height="150">
+        <img class="tree tree--d" src="assets/map/tree-3.svg" alt="" width="160" height="150">
+        <img class="tree tree--e" src="assets/map/tree-2.svg" alt="" width="150" height="260">
+        <img class="tree tree--f" src="assets/map/tree-1.svg" alt="" width="200" height="240">
+      </div>
+
       <!-- Объекты: кнопки, открывающие разделы -->
       <button class="map-object map-object--memes" type="button" data-section="memes">
         <span class="map-object__art map-object__art--cloud">
-          <img src="assets/map/cloud.svg" alt="" width="200" height="100">
+          <img src="assets/map/cloud.svg" alt="" width="220" height="120">
         </span>
         <span class="map-object__label" data-text="sections.memes.mapLabel"></span>
       </button>
 
       <button class="map-object map-object--house" type="button" data-section="house">
         <span class="map-object__art map-object__art--house">
-          <img src="assets/map/house.svg" alt="" width="120" height="120">
+          <img src="assets/map/house.svg" alt="" width="170" height="160">
         </span>
         <span class="map-object__label" data-text="sections.house.mapLabel"></span>
       </button>
 
       <button class="map-object map-object--iceberg" type="button" data-section="iceberg">
         <span class="map-object__art map-object__art--iceberg">
-          <img src="assets/map/iceberg.svg" alt="" width="120" height="130">
+          <img src="assets/map/iceberg.svg" alt="" width="140" height="150">
         </span>
         <span class="map-object__label" data-text="sections.iceberg.mapLabel"></span>
       </button>

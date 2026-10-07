@@ -1,8 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
-  <!-- Заглушка: томат -->
-  <g stroke="#2a2a4a" stroke-width="2.5" stroke-linejoin="round">
-    <circle cx="20" cy="23" r="14" fill="#ef8d88"/>
-    <path d="M20 9 L24 13 L30 11 L26 16 L20 15 L14 16 L10 11 L16 13 Z" fill="#caffbf"/>
+  <!-- Томат -->
+  <defs>
+    <filter id="blur"><feGaussianBlur stdDeviation="1.6"/></filter>
+    <clipPath id="fruit"><circle cx="20" cy="23" r="14"/></clipPath>
+  </defs>
+  <g clip-path="url(#fruit)">
+    <rect width="40" height="40" fill="#e8675b"/>
+    <circle cx="27" cy="31" r="12" fill="#c24a41" filter="url(#blur)"/>
+    <ellipse cx="14" cy="19" rx="4" ry="5.5" fill="#ffadad" filter="url(#blur)"/>
   </g>
-  <ellipse cx="14" cy="21" rx="3" ry="4" fill="#ffffff" opacity="0.6"/>
+  <path d="M20 10 L24 14 L30 12 L26 17 L20 16 L14 17 L10 12 L16 14 Z" fill="#4f9a3a"/>
+  <path d="M20 12 L20 6" stroke="#3f7a35" stroke-width="2.4" stroke-linecap="round"/>
 </svg>

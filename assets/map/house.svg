@@ -1,12 +1,65 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-  <!-- Заглушка: «Домик спецпроекта» -->
-  <g stroke="#2a2a4a" stroke-width="3" stroke-linejoin="round">
-    <rect x="78" y="18" width="12" height="24" fill="#ffadad"/>
-    <rect x="20" y="52" width="80" height="62" fill="#ffd6a5"/>
-    <path d="M8 56 L60 12 L112 56 Z" fill="#ef8d88"/>
-    <rect x="28" y="64" width="18" height="18" rx="2" fill="#9bf6ff"/>
-    <rect x="74" y="64" width="18" height="18" rx="2" fill="#9bf6ff"/>
-    <rect id="door" x="50" y="80" width="20" height="34" rx="3" fill="#bdb2ff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 160">
+  <!-- «Домик спецпроекта». Дверь — отдельный элемент #door, её будем открывать -->
+  <defs>
+    <filter id="brush" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="5"/>
+      <feDisplacementMap in="SourceGraphic" scale="3"/>
+    </filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="4"/></filter>
+  </defs>
+
+  <!-- Тень на траве -->
+  <ellipse cx="92" cy="146" rx="74" ry="9" fill="#2f5e2f" opacity="0.35"/>
+
+  <g filter="url(#brush)">
+    <!-- Боковая стена в тени -->
+    <path d="M116 74 L150 60 L150 122 L116 140 Z" fill="#e3bf93"/>
+    <path d="M124 84 L140 78 L140 98 L124 104 Z" fill="#f6e48c"/>
+    <!-- Фасад -->
+    <rect x="26" y="74" width="90" height="66" fill="#fbe6c6"/>
+    <rect x="26" y="74" width="90" height="10" fill="#efd3aa" opacity="0.7"/>
+    <!-- Крыша: фасадный скат и боковой -->
+    <path d="M70 22 L104 8 L160 60 L126 78 Z" fill="#c75f58"/>
+    <path d="M14 80 L70 22 L126 78 Z" fill="#e8776d"/>
+    <path d="M70 22 L104 8" stroke="#a84c47" stroke-width="3" stroke-linecap="round"/>
+    <!-- Черепица -->
+    <g stroke="#c75f58" stroke-width="2" opacity="0.6" stroke-linecap="round">
+      <path d="M44 56 L96 56"/><path d="M32 68 L108 68"/><path d="M58 42 L82 42"/>
+    </g>
+    <!-- Труба -->
+    <path d="M126 22 L138 17 L138 44 L126 49 Z" fill="#b65650"/>
+    <path d="M124 21 L139 15 L141 18 L126 24 Z" fill="#8f413d"/>
+    <!-- Окна с тёплым светом -->
+    <rect x="34" y="88" width="20" height="20" rx="2" fill="#fff3a6"/>
+    <rect x="90" y="88" width="20" height="20" rx="2" fill="#fff3a6"/>
+    <g stroke="#ffffff" stroke-width="2.5">
+      <path d="M44 88 V108 M34 98 H54"/><path d="M100 88 V108 M90 98 H110"/>
+    </g>
+    <!-- Порог -->
+    <rect x="56" y="137" width="32" height="5" rx="2" fill="#c9b49a"/>
   </g>
-  <circle cx="65" cy="98" r="2" fill="#2a2a4a"/>
+
+  <!-- Дверь -->
+  <g id="door">
+    <rect x="61" y="100" width="22" height="38" rx="3" fill="#6f9fdc"/>
+    <rect x="64" y="104" width="16" height="13" rx="2" fill="#8bb4e8"/>
+    <circle cx="78" cy="122" r="2" fill="#fdffb6"/>
+  </g>
+
+  <!-- Свет из окон -->
+  <circle cx="44" cy="98" r="14" fill="#fdffb6" opacity="0.35" filter="url(#glow)"/>
+  <circle cx="100" cy="98" r="14" fill="#fdffb6" opacity="0.35" filter="url(#glow)"/>
+
+  <!-- Кусты с цветами у стены -->
+  <g filter="url(#brush)">
+    <ellipse cx="30" cy="136" rx="20" ry="11" fill="#3f8a3a"/>
+    <ellipse cx="25" cy="131" rx="12" ry="8" fill="#68ab3d"/>
+    <ellipse cx="122" cy="140" rx="18" ry="10" fill="#3f8a3a"/>
+    <ellipse cx="118" cy="135" rx="10" ry="7" fill="#9ccb45"/>
+  </g>
+  <g>
+    <circle cx="20" cy="130" r="2.4" fill="#ffadad"/><circle cx="32" cy="128" r="2.4" fill="#fdffb6"/>
+    <circle cx="40" cy="134" r="2.4" fill="#ffadad"/><circle cx="114" cy="134" r="2.4" fill="#ffc6ff"/>
+    <circle cx="126" cy="136" r="2.4" fill="#ffffff"/>
+  </g>
 </svg>

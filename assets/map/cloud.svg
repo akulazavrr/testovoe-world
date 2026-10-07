@@ -1,22 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 100">
-  <!-- Заглушка: «Мемное облако», два слипшихся облака -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 120">
+  <!-- «Мемное облако»: два слипшихся облака, белое и розовое -->
   <defs>
-    <g id="right">
-      <circle cx="122" cy="56" r="20"/>
-      <circle cx="148" cy="40" r="25"/>
-      <circle cx="174" cy="56" r="18"/>
-      <rect x="104" y="52" width="86" height="30" rx="15"/>
-    </g>
-    <g id="left">
-      <circle cx="40" cy="62" r="22"/>
-      <circle cx="70" cy="42" r="30"/>
-      <circle cx="102" cy="58" r="22"/>
-      <rect x="18" y="58" width="106" height="30" rx="15"/>
-    </g>
+    <filter id="brush" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="2"/>
+      <feDisplacementMap in="SourceGraphic" scale="4"/>
+    </filter>
+    <filter id="blur"><feGaussianBlur stdDeviation="5"/></filter>
+    <clipPath id="pink-shape">
+      <circle cx="136" cy="62" r="22"/><circle cx="162" cy="44" r="27"/><circle cx="190" cy="62" r="20"/>
+      <rect x="116" y="58" width="94" height="34" rx="17"/>
+    </clipPath>
+    <clipPath id="white-shape">
+      <circle cx="46" cy="70" r="24"/><circle cx="78" cy="46" r="33"/><circle cx="114" cy="64" r="24"/>
+      <rect x="22" y="64" width="116" height="34" rx="17"/>
+    </clipPath>
   </defs>
-  <!-- Контур рисуется расширенной тёмной копией под заливкой -->
-  <use xlink:href="#right" fill="#2a2a4a" stroke="#2a2a4a" stroke-width="7"/>
-  <use xlink:href="#right" fill="#ffc6ff"/>
-  <use xlink:href="#left" fill="#2a2a4a" stroke="#2a2a4a" stroke-width="7"/>
-  <use xlink:href="#left" fill="#ffffff"/>
+
+  <g filter="url(#brush)">
+    <!-- Розовое облако -->
+    <g clip-path="url(#pink-shape)">
+      <rect x="100" y="0" width="120" height="120" fill="#ffd0ee"/>
+      <ellipse cx="166" cy="98" rx="60" ry="22" fill="#f2a9d6" filter="url(#blur)"/>
+      <ellipse cx="150" cy="34" rx="22" ry="12" fill="#fff0fa" filter="url(#blur)"/>
+    </g>
+    <!-- Белое облако -->
+    <g clip-path="url(#white-shape)">
+      <rect x="0" y="0" width="150" height="120" fill="#ffffff"/>
+      <ellipse cx="86" cy="104" rx="76" ry="24" fill="#d6e2f3" filter="url(#blur)"/>
+      <ellipse cx="128" cy="78" rx="14" ry="20" fill="#e6edf8" filter="url(#blur)"/>
+    </g>
+  </g>
 </svg>

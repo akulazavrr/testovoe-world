@@ -19,6 +19,11 @@
   --c-deep-2: #463f86;
   --c-deep-3: #2a2a4a;
 
+  /* Цвета мира в духе референса: насыщеннее и природнее основной палитры */
+  --c-sky-top: #86aee0;
+  --c-sky-mid: #b4cff0;
+  --c-sky-horizon: #d9e8f6;
+
   --c-text: #2a2a4a;
   --c-white: #ffffff;
 
@@ -62,7 +67,7 @@ body {
   font-size: var(--text-size);
   line-height: 1.5;
   color: var(--c-text);
-  background: var(--c-blue);
+  background: var(--c-sky-top);
   -webkit-font-smoothing: antialiased;
 }
 

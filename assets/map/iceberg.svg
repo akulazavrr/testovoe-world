@@ -1,8 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 130">
-  <!-- Заглушка: «Айсберг вирусного спеца». Малая часть над водой, большая под водой -->
-  <g stroke="#2a2a4a" stroke-width="3" stroke-linejoin="round">
-    <path d="M14 54 L104 54 L116 84 L94 120 L42 126 L6 92 Z" fill="#bdb2ff" fill-opacity="0.75"/>
-    <path d="M18 54 L42 18 L56 28 L72 6 L102 54 Z" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 150">
+  <!-- «Айсберг вирусного спеца»: малая часть над водой, большая под водой -->
+  <defs>
+    <filter id="brush" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="9"/>
+      <feDisplacementMap in="SourceGraphic" scale="3"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#brush)">
+    <!-- Подводная часть просвечивает сквозь воду -->
+    <path d="M14 60 L126 60 L136 96 L114 136 L56 146 L8 104 Z" fill="#b6d8f7" opacity="0.75"/>
+    <path d="M70 60 L126 60 L136 96 L114 136 L60 120 Z" fill="#8cbbe9" opacity="0.6"/>
+    <path d="M14 60 L40 60 L30 100 L8 104 Z" fill="#d5e9fb" opacity="0.6"/>
+
+    <!-- Надводная часть -->
+    <path d="M20 60 L48 22 L62 32 L82 6 L108 40 L120 60 Z" fill="#ffffff"/>
+    <path d="M82 6 L108 40 L120 60 L86 60 L78 30 Z" fill="#cfe2f7"/>
+    <path d="M48 22 L62 32 L56 60 L44 60 Z" fill="#e6f1fd"/>
+    <path d="M20 60 L48 22 L36 60 Z" fill="#f4f9ff"/>
   </g>
-  <path d="M0 54 Q10 49 20 54 T40 54 T60 54 T80 54 T100 54 T120 54" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Линия воды и пена -->
+  <path d="M0 60 Q8 55 16 60 T32 60 T48 60 T64 60 T80 60 T96 60 T112 60 T128 60 T140 60" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+  <g fill="#ffffff" opacity="0.8">
+    <ellipse cx="10" cy="62" rx="5" ry="1.6"/><ellipse cx="128" cy="62" rx="6" ry="1.6"/>
+  </g>
 </svg>
