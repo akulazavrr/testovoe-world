@@ -150,15 +150,15 @@
   border: 0;
   border-radius: 50%;
   color: var(--c-text);
-  background: #eef2fa;
-  font-size: 28px;
+  background: none;
+  font-size: 32px;
   line-height: 1;
   cursor: pointer;
-  transition: background-color 150ms var(--ease);
+  transition: scale 150ms var(--ease);
 }
 
 .house__close:hover {
-  background: var(--c-blue);
+  scale: 1.15;
 }
 
 /* ---------- Страницы ---------- */
@@ -294,28 +294,23 @@
   text-align: center;
 }
 
+/* «Далее» и «Назад» — белые, без обводки. Лёгкая тень отделяет их от полупрозрачного поп-апа */
 .house__btn {
   min-height: 48px;
   padding: 12px 22px;
-  border: 2px solid var(--c-blue);
+  border: 0;
   border-radius: 999px;
   color: var(--c-text);
+  background: var(--c-white);
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
-  transition: scale 150ms var(--ease), background-color 150ms var(--ease);
+  box-shadow: 0 2px 10px rgba(30, 24, 44, 0.1);
+  transition: scale 150ms var(--ease);
 }
 
 .house__btn:hover {
   scale: 1.04;
-}
-
-.house__btn--next {
-  background: var(--c-blue);
-}
-
-.house__btn--prev {
-  background: var(--c-white);
 }
 
 /* Боковые стрелки — только на десктопе; на телефоне их заменяет свайп */
@@ -376,18 +371,19 @@
     justify-content: center;
     width: 56px;
     height: 56px;
-    border: 2px solid var(--c-blue);
+    border: 0;
     border-radius: 50%;
     color: var(--c-text);
     background: var(--c-white);
     font-size: 24px;
     cursor: pointer;
+    box-shadow: 0 2px 10px rgba(30, 24, 44, 0.1);
     transform: translateY(-50%);
-    transition: background-color 150ms var(--ease);
+    transition: scale 150ms var(--ease);
   }
 
   .house__arrow:hover {
-    background: var(--c-blue);
+    scale: 1.08;
   }
 
   .house__arrow--prev {
