@@ -94,7 +94,7 @@
 .house__reopen {
   position: absolute;
   left: 50%;
-  bottom: 12vh;
+  bottom: max(24px, 4vh);
   z-index: 2;
   min-height: 52px;
   padding: 14px 28px;

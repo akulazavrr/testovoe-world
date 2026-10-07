@@ -1,8 +1,9 @@
 // Раздел «Качок Кабачок» (домик). Задание: docs/02-house.md
 //
-// Клик по домику на карте → дверь открывается → экран заполняет интерьер дома →
-// поверх появляется поп-ап из двух страниц. Крестик закрывает поп-ап и оставляет
-// интерьер (решение автора); на карту ведёт общая кнопка «На карту», дверь закрывается.
+// Клик по домику на карте → дверь открывается → экран заполняет интерьер дома
+// с Кабачком и кнопкой «Открыть проект» → по нажатию появляется поп-ап из двух страниц.
+// Крестик закрывает поп-ап и оставляет интерьер (решение автора); на карту ведёт
+// общая кнопка «На карту», дверь закрывается.
 
 import { el, prefersReducedMotion, sectionTitleId } from './utils.js';
 
@@ -10,9 +11,6 @@ const NAME = 'house';
 const DOOR_MS = 500;  // должно совпадать с transition двери в css/map.css
 const FADE_MS = 300;  // должно совпадать с --popup-fade в css/house.css
 const SWIPE_PX = 50;  // минимальная длина свайпа
-// Сколько показывать чёткую комнату с Кабачком до появления поп-апа
-// (из них ~0,7 с — анимация входа в дом)
-const POPUP_DELAY_MS = 3000;
 
 let root = null;
 let wrapper = null;
@@ -103,22 +101,30 @@ function showPage(index, { focus = false } = {}) {
 
 // ---------- Поп-ап ----------
 
-// delay — пауза перед появлением (при входе в раздел поп-ап ждёт, пока «войдём» в дом)
-function openPopup({ delay = 0 } = {}) {
+function openPopup() {
   clearTimeout(hideTimer);
   popupOpen = true;
   popup.hidden = false;
   reopenButton.hidden = true;
   popup.classList.remove('is-visible');
-  // Размытие комнаты и поп-ап появляются одновременно. Пауза перед ними — не движение,
-  // поэтому сохраняется и при «уменьшить движение» (там просто нет плавных переходов)
-  const show = () => {
+  void popup.offsetWidth;
+  // Размытие комнаты и поп-ап появляются одновременно
+  // (если поп-ап успели закрыть до следующего кадра — ничего не делаем)
+  requestAnimationFrame(() => {
+    if (!popupOpen) return;
     wrapper.classList.add('is-popup-open');
     popup.classList.add('is-visible');
-  };
-  void popup.offsetWidth;
-  if (delay > 0) hideTimer = setTimeout(show, delay);
-  else requestAnimationFrame(show);
+  });
+}
+
+// Поп-ап сразу скрыт, видна комната и кнопка «Открыть проект»
+function hidePopupNow() {
+  clearTimeout(hideTimer);
+  popupOpen = false;
+  wrapper.classList.remove('is-popup-open');
+  popup.classList.remove('is-visible');
+  popup.hidden = true;
+  reopenButton.hidden = false;
 }
 
 function closePopup() {
@@ -268,22 +274,24 @@ export async function beforeOpen(button) {
   if (!prefersReducedMotion()) await wait(DOOR_MS);
 }
 
+// Возвращает элемент, на который main.js поставит фокус: кнопку «Открыть проект»
 export function onOpen() {
   active = true;
   mapHouse()?.classList.add('is-door-open'); // при входе по прямой ссылке дверь тоже «открыта»
 
-  // Каждый вход — с первой страницы и открытым поп-апом
+  // Каждый вход: комната с Кабачком и кнопка «Открыть проект»;
+  // поп-ап — только по нажатию, с первой страницы
   pages[current].hidden = true;
   current = 0;
   pages[0].hidden = false;
   pages[0].classList.remove('is-entering-next', 'is-entering-prev');
   updateNav();
-  // Сначала видна комната с Кабачком, поп-ап появляется после паузы
-  openPopup({ delay: POPUP_DELAY_MS });
+  hidePopupNow();
 
   wrapper.classList.remove('is-entering');
   void wrapper.offsetWidth;
   wrapper.classList.add('is-entering');
+  return reopenButton;
 }
 
 export function onClose() {

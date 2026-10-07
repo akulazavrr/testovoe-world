@@ -76,8 +76,9 @@ function openSection(name) {
   // Кадр ожидания, чтобы сработал плавный переход появления
   requestAnimationFrame(() => overlay.classList.add('is-open'));
 
-  modules[name].onOpen?.();
-  document.getElementById(sectionTitleId(name))?.focus({ preventScroll: true });
+  // Раздел может вернуть элемент для фокуса; иначе фокус — на заголовок раздела
+  const focusTarget = modules[name].onOpen?.() ?? document.getElementById(sectionTitleId(name));
+  focusTarget?.focus({ preventScroll: true });
 }
 
 function hideSectionNow(name) {
