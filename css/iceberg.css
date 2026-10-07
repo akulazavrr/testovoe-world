@@ -27,20 +27,18 @@
   background-image: var(--grain);
 }
 
-/* ---------- Заголовок: закреплён сверху, без подложки ----------
-   Белый текст с мягкой тенью, как кнопка «На карту»: читается и на небе, и на воде.
+/* ---------- Заголовок: стоит на месте и уходит вверх при прокрутке ----------
+   Белый текст с мягкой тенью, как кнопка «На карту».
    На телефоне — строкой под кнопкой, на десктопе — в одной строке с ней, по центру. */
 
 .iceberg__header {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 6;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 80px;
   padding: 64px var(--gutter) 0;
-  pointer-events: none; /* не мешает кликам по словам под ним */
 }
 
 .iceberg__title {
@@ -84,13 +82,44 @@
   --below: 108vh;   /* толща воды */
   --seabed: 36vh;   /* дно */
 
+  /* Волна поверхности: одна на всю сцену. Ею обрезаются вода и обе части айсберга,
+     поэтому граница везде одна и та же, без стыков. Полоса волны — 28px вокруг --above. */
+  --wave-top: calc(var(--above) - 14px);
+  --wave-below: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='28'><path d='M0 14 C30 6 50 6 80 14 S130 22 160 14 S210 6 240 14 V28 H0 Z'/></svg>");
+  --wave-above: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='28'><path d='M0 14 C30 6 50 6 80 14 S130 22 160 14 S210 6 240 14 V0 H0 Z'/></svg>");
+
   position: relative;
   height: calc(var(--above) + var(--below) + var(--seabed));
-  /* Вода: светлая у поверхности, темнеет к дну — так при скролле вниз фон темнеет */
+}
+
+/* Всё, что ниже волны */
+.iceberg__water,
+.iceberg__ice-layer--under {
+  -webkit-mask:
+    var(--wave-below) repeat-x 0 var(--wave-top) / 240px 28px,
+    linear-gradient(#000, #000) no-repeat 0 calc(var(--wave-top) + 27px) / 100% 100%;
+  mask:
+    var(--wave-below) repeat-x 0 var(--wave-top) / 240px 28px,
+    linear-gradient(#000, #000) no-repeat 0 calc(var(--wave-top) + 27px) / 100% 100%;
+}
+
+/* Всё, что выше волны */
+.iceberg__ice-layer--above {
+  -webkit-mask:
+    var(--wave-above) repeat-x 0 var(--wave-top) / 240px 28px,
+    linear-gradient(#000, #000) no-repeat 0 0 / 100% calc(var(--wave-top) + 1px);
+  mask:
+    var(--wave-above) repeat-x 0 var(--wave-top) / 240px 28px,
+    linear-gradient(#000, #000) no-repeat 0 0 / 100% calc(var(--wave-top) + 1px);
+}
+
+/* Вода: светлая у поверхности, темнеет к дну — так при скролле вниз фон темнеет */
+.iceberg__water {
+  position: absolute;
+  inset: 0;
   background: linear-gradient(
     180deg,
-    transparent 0,
-    transparent var(--above),
+    #8fc4f2 0,
     #8fc4f2 var(--above),
     #5c9be0 calc(var(--above) + 28vh),
     var(--c-deep-1) calc(var(--above) + 65vh),
@@ -100,14 +129,15 @@
   );
 }
 
-/* Поверхность воды: волна с пеной поперёк всей ширины */
-.iceberg__surface {
+/* Пена: белая линия по той же волне */
+.iceberg__foam {
   position: absolute;
-  top: calc(var(--above) - 14px);
+  top: var(--wave-top);
   left: 0;
   width: 100%;
   height: 28px;
-  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='28'><path d='M0 14 C30 6 50 6 80 14 S130 22 160 14 S210 6 240 14 V28 H0 Z' fill='%238fc4f2'/><path d='M0 14 C30 6 50 6 80 14 S130 22 160 14 S210 6 240 14' fill='none' stroke='white' stroke-width='3' opacity='0.85'/></svg>") repeat-x left top / 240px 28px;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='28'><path d='M0 14 C30 6 50 6 80 14 S130 22 160 14 S210 6 240 14' fill='none' stroke='white' stroke-width='3' opacity='0.85'/></svg>") repeat-x 0 0 / 240px 28px;
+  pointer-events: none;
 }
 
 /* Лучи света под водой */
@@ -123,8 +153,20 @@
   pointer-events: none;
 }
 
-/* Айсберг. Линия воды в картинке — на 32% её высоты, поэтому высота
-   подобрана так, чтобы она совпала с --above. На телефоне чуть шире экрана — так он массивнее */
+/* Айсберг лежит в двух слоях на всю ширину сцены: надводный слой обрезан волной сверху,
+   подводный — снизу и полупрозрачен, поэтому лёд просвечивает сквозь воду и темнеет с глубиной */
+.iceberg__ice-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.iceberg__ice-layer--under {
+  opacity: 0.55;
+}
+
+/* Линия воды в картинке — на 32% её высоты, поэтому высота подобрана так,
+   чтобы она совпала с --above. На телефоне чуть шире экрана — так он массивнее */
 .iceberg__ice {
   position: absolute;
   top: var(--ice-top);
@@ -237,11 +279,14 @@
   outline-color: var(--c-white);
 }
 
-/* Активное слово: светло-лавандовый, уходящий в голубой и синий */
+/* Активное слово: ровный голубой, без теней и обводки */
 .iceberg__level.is-active .iceberg__word {
   color: var(--c-text);
-  background: linear-gradient(120deg, #e4dfff 0%, var(--c-blue) 55%, #7ea6e6 100%);
-  border-color: transparent;
+  background: var(--c-blue);
+  border-color: var(--c-blue);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 /* Вопрос: на телефоне — карточкой под словом */

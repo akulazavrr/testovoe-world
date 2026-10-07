@@ -10,7 +10,6 @@ const NAME = 'iceberg';
 const FADE_MS = 250; // должно совпадать с --question-fade в css/iceberg.css
 
 let wrapper = null;   // корневой блок раздела
-let subtitle = null;
 let bottomText = null;
 let bottomObserver = null;
 let items = [];       // { li, button, card }
@@ -25,6 +24,19 @@ function levelTop(indexInGroup, groupSize, underwater) {
   }
   const f = 0.06 + 0.78 * ((indexInGroup + 0.5) / groupSize);
   return `calc(var(--above) + var(--below) * ${f.toFixed(3)})`;
+}
+
+// Слой с картинкой айсберга на всю ширину сцены (чтобы волна-маска совпадала с водой)
+function iceLayer(modifier) {
+  return el('div', { className: `iceberg__ice-layer ${modifier}`, attrs: { 'aria-hidden': 'true' } }, [
+    el('img', {
+      className: 'iceberg__ice',
+      src: 'assets/iceberg/iceberg.svg',
+      alt: '',
+      loading: 'lazy',
+      decoding: 'async',
+    }),
+  ]);
 }
 
 function openQuestion(i) {
@@ -101,37 +113,21 @@ export function init(root, content) {
       el('h2', { className: 'iceberg__title', id: sectionTitleId(NAME), tabIndex: -1, text: data.title }),
     ]),
     setText(el('p', { className: 'iceberg__subtitle' }), data.subtitle),
+    // Слои сцены снизу вверх. Вода, подводная и надводная части айсберга
+    // обрезаются одной и той же волной, поэтому граница у них общая
     el('div', { className: 'iceberg__scene' }, [
-      el('div', { className: 'iceberg__surface', attrs: { 'aria-hidden': 'true' } }),
+      el('div', { className: 'iceberg__water', attrs: { 'aria-hidden': 'true' } }),
       el('div', { className: 'iceberg__rays', attrs: { 'aria-hidden': 'true' } }),
-      el('img', {
-        className: 'iceberg__ice',
-        src: 'assets/iceberg/iceberg.svg',
-        alt: '',
-        loading: 'lazy',
-        decoding: 'async',
-      }),
-      levels,
+      iceLayer('iceberg__ice-layer--under'),
+      iceLayer('iceberg__ice-layer--above'),
       el('div', { className: 'iceberg__seabed', attrs: { 'aria-hidden': 'true' } }),
+      el('div', { className: 'iceberg__foam', attrs: { 'aria-hidden': 'true' } }),
+      levels,
       bottomText,
     ]),
   ]);
 
   root.replaceChildren(wrapper);
-
-  // Шапка прозрачная, поэтому подпись при прокрутке растворяется,
-  // а не наезжает на заголовок и кнопку «На карту»
-  subtitle = wrapper.querySelector('.iceberg__subtitle');
-  let ticking = false;
-  root.addEventListener('scroll', () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      const fade = Math.min(1, root.scrollTop / (subtitle.offsetHeight * 0.8));
-      subtitle.style.opacity = String(1 - fade);
-      ticking = false;
-    });
-  }, { passive: true });
 
   // Финальная строка проявляется, когда пользователь доскроллил до дна
   bottomObserver = new IntersectionObserver(
@@ -147,7 +143,6 @@ export function onOpen() {
   // Каждое открытие — с чистого листа: вопросы закрыты, дно ещё не показано
   if (openIndex !== null) closeQuestion(openIndex, { instant: true });
   bottomText.classList.remove('is-visible');
-  subtitle.style.opacity = '';
 
   // Перезапуск анимации появления заголовка, подписи и сцены
   wrapper.classList.remove('is-entering');
