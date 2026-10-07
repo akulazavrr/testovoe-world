@@ -36,6 +36,8 @@
   --gutter: 16px;
   --radius: 16px;
   --outline: 3px solid var(--c-text);
+  /* Тень для белого текста поверх иллюстраций */
+  --shadow-on-image: 0 1px 2px rgba(20, 36, 60, 0.7), 0 0 10px rgba(20, 36, 60, 0.45);
 
   /* Зерно бумаги поверх иллюстраций (карта, разделы) */
   --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.2  0 0 0 0 0.2  0 0 0 0 0.3  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
@@ -149,7 +151,8 @@ button {
   inset: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: var(--c-white);
+  /* Небо по умолчанию: на нём читается белая кнопка «На карту» */
+  background: linear-gradient(180deg, var(--c-sky-top), var(--c-sky-horizon));
 }
 
 .section[hidden] {
@@ -177,6 +180,8 @@ button {
 
 /* ---------- Кнопка возврата на карту (одна на все разделы) ---------- */
 
+/* Белый текст со стрелкой без подложки. Мягкая тень — чтобы читался
+   и на светлом небе, и на тёмной воде. */
 .back-button {
   position: fixed;
   top: max(16px, env(safe-area-inset-top));
@@ -186,24 +191,23 @@ button {
   align-items: center;
   gap: 8px;
   min-height: 48px;
-  padding: 10px 20px;
-  border: 2px solid var(--c-text);
-  border-radius: 999px;
-  background: var(--c-white);
+  padding: 10px 4px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--c-white);
+  background: none;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 0 var(--c-text);
-  transition: transform 150ms var(--ease), box-shadow 150ms var(--ease);
+  text-shadow: var(--shadow-on-image);
+  transition: transform 150ms var(--ease);
 }
 
 .back-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 var(--c-text);
+  transform: translateX(-3px);
 }
 
-.back-button:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 var(--c-text);
+.back-button:focus-visible {
+  outline-color: var(--c-white);
 }
 
 /* ---------- Меньше движения ---------- */

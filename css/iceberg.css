@@ -27,7 +27,9 @@
   background-image: var(--grain);
 }
 
-/* ---------- Заголовок: закреплён сверху ---------- */
+/* ---------- Заголовок: закреплён сверху, без подложки ----------
+   Белый текст с мягкой тенью, как кнопка «На карту»: читается и на небе, и на воде.
+   На телефоне — строкой под кнопкой, на десктопе — в одной строке с ней, по центру. */
 
 .iceberg__header {
   position: sticky;
@@ -35,46 +37,51 @@
   z-index: 6;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   min-height: 80px;
-  /* Слева место под общую кнопку «На карту» */
-  padding: 0 var(--gutter) 0 170px;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  padding: 64px var(--gutter) 0;
+  pointer-events: none; /* не мешает кликам по словам под ним */
 }
 
 .iceberg__title {
+  color: var(--c-white);
   font-size: clamp(1.125rem, 0.8rem + 1.4vw, 1.75rem);
+  text-align: center;
+  text-shadow: var(--shadow-on-image);
 }
 
 .iceberg__title:focus {
   outline: none;
 }
 
+/* Подпись: интервалы как у подзаголовка на главной */
 .iceberg__subtitle {
   position: relative;
   z-index: 5;
-  max-width: 40em;
   margin: 0 auto;
-  padding: 32px var(--gutter) 0;
-  font-size: calc(var(--text-size) * 1.1);
-  line-height: 1.4;
+  padding: 16px var(--gutter) 0;
+  line-height: 1.3;
   text-align: center;
+  text-wrap: balance;
 }
 
-/* Вторая строка подписи — «Сильно углубиться» — отдельной строкой с отступом */
-.iceberg__subtitle .text-line + .text-line {
-  margin-top: 8px;
-  font-weight: 700;
+/* На узком экране авторские переносы не помещаются: текст идёт сплошным абзацем */
+@media (max-width: 599px) {
+  .iceberg__subtitle .text-line {
+    display: inline;
+  }
+
+  .iceberg__subtitle .text-line + .text-line::before {
+    content: ' ';
+  }
 }
 
 /* ---------- Сцена ---------- */
 
 .iceberg__scene {
-  --ice-top: 6vh;   /* верхушка айсберга от начала сцены */
-  --above: 72vh;    /* линия воды от начала сцены */
-  --below: 140vh;   /* толща воды */
+  --ice-top: 5vh;   /* верхушка айсберга от начала сцены */
+  --above: 58vh;    /* линия воды от начала сцены */
+  --below: 108vh;   /* толща воды */
   --seabed: 36vh;   /* дно */
 
   position: relative;
@@ -85,9 +92,9 @@
     transparent 0,
     transparent var(--above),
     #8fc4f2 var(--above),
-    #5c9be0 calc(var(--above) + 35vh),
-    var(--c-deep-1) calc(var(--above) + 85vh),
-    var(--c-deep-2) calc(var(--above) + 125vh),
+    #5c9be0 calc(var(--above) + 28vh),
+    var(--c-deep-1) calc(var(--above) + 65vh),
+    var(--c-deep-2) calc(var(--above) + 95vh),
     var(--c-deep-3) calc(var(--above) + var(--below)),
     #1d1d36 100%
   );
@@ -116,15 +123,15 @@
   pointer-events: none;
 }
 
-/* Айсберг. Линия воды в картинке — на 30,87% её высоты, поэтому высота
-   подобрана так, чтобы она совпала с --above */
+/* Айсберг. Линия воды в картинке — на 32% её высоты, поэтому высота
+   подобрана так, чтобы она совпала с --above. На телефоне чуть шире экрана — так он массивнее */
 .iceberg__ice {
   position: absolute;
   top: var(--ice-top);
   left: 50%;
-  width: min(88vw, 440px);
+  width: min(104vw, 560px);
   max-width: none;
-  height: calc((var(--above) - var(--ice-top)) / 0.3087);
+  height: calc((var(--above) - var(--ice-top)) / 0.32);
   transform: translateX(-50%);
   filter: drop-shadow(0 10px 18px rgba(20, 30, 60, 0.25));
 }
@@ -230,11 +237,11 @@
   outline-color: var(--c-white);
 }
 
-/* Активное слово */
+/* Активное слово: светло-лавандовый, уходящий в голубой и синий */
 .iceberg__level.is-active .iceberg__word {
   color: var(--c-text);
-  background: var(--c-coral);
-  border-color: var(--c-coral);
+  background: linear-gradient(120deg, #e4dfff 0%, var(--c-blue) 55%, #7ea6e6 100%);
+  border-color: transparent;
 }
 
 /* Вопрос: на телефоне — карточкой под словом */
@@ -246,7 +253,6 @@
   margin: 0;
   transform: translateX(-50%);
   padding: 14px 18px;
-  border-left: 4px solid var(--c-coral);
   border-radius: var(--radius);
   color: var(--c-text);
   background: var(--c-white);
@@ -266,15 +272,15 @@
 /* ---------- Появление при входе в раздел ---------- */
 
 .iceberg.is-entering .iceberg__header {
-  animation: iceberg-in 500ms var(--ease) both;
+  animation: iceberg-in 500ms var(--ease) backwards;
 }
 
 .iceberg.is-entering .iceberg__subtitle {
-  animation: iceberg-in 500ms var(--ease) 250ms both;
+  animation: iceberg-in 500ms var(--ease) 250ms backwards;
 }
 
 .iceberg.is-entering .iceberg__scene {
-  animation: iceberg-fade 600ms var(--ease) 450ms both;
+  animation: iceberg-fade 600ms var(--ease) 450ms backwards;
 }
 
 @keyframes iceberg-in {
@@ -291,17 +297,15 @@
 
 @media (min-width: 768px) {
   .iceberg__header {
-    justify-content: center;
-    padding-left: 200px;
-    padding-right: 200px;
+    padding: 0 200px;
   }
 
   .iceberg__subtitle {
-    padding-top: 40px;
+    padding-top: 24px;
   }
 
   .iceberg__ice {
-    width: clamp(300px, 36vw, 520px);
+    width: clamp(380px, 46vw, 660px);
   }
 
   /* Справа от слова, по центру его высоты */

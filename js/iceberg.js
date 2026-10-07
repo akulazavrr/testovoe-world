@@ -10,6 +10,7 @@ const NAME = 'iceberg';
 const FADE_MS = 250; // должно совпадать с --question-fade в css/iceberg.css
 
 let wrapper = null;   // корневой блок раздела
+let subtitle = null;
 let bottomText = null;
 let bottomObserver = null;
 let items = [];       // { li, button, card }
@@ -118,6 +119,20 @@ export function init(root, content) {
 
   root.replaceChildren(wrapper);
 
+  // Шапка прозрачная, поэтому подпись при прокрутке растворяется,
+  // а не наезжает на заголовок и кнопку «На карту»
+  subtitle = wrapper.querySelector('.iceberg__subtitle');
+  let ticking = false;
+  root.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const fade = Math.min(1, root.scrollTop / (subtitle.offsetHeight * 0.8));
+      subtitle.style.opacity = String(1 - fade);
+      ticking = false;
+    });
+  }, { passive: true });
+
   // Финальная строка проявляется, когда пользователь доскроллил до дна
   bottomObserver = new IntersectionObserver(
     (entries) => {
@@ -132,6 +147,7 @@ export function onOpen() {
   // Каждое открытие — с чистого листа: вопросы закрыты, дно ещё не показано
   if (openIndex !== null) closeQuestion(openIndex, { instant: true });
   bottomText.classList.remove('is-visible');
+  subtitle.style.opacity = '';
 
   // Перезапуск анимации появления заголовка, подписи и сцены
   wrapper.classList.remove('is-entering');

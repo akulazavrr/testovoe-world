@@ -1,41 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 1500" preserveAspectRatio="none">
-  <!-- Айсберг для раздела «Вирусный проект». Растягивается на всю высоту сцены.
-       Линия воды — на y = 463 (≈ треть высоты), так же, как в css/iceberg.css -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 1000" preserveAspectRatio="none">
+  <!-- Айсберг для раздела «Айсберг вирусного проекта». Растягивается на всю высоту сцены.
+       Линия воды — на y = 320 (32% высоты), так же, как в css/iceberg.css.
+       Без фильтров: граница воды и грани остаются ровными и чёткими при любом растяжении. -->
   <defs>
-    <filter id="brush" x="-5%" y="-2%" width="110%" height="104%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.03 0.012" numOctaves="2" seed="5"/>
-      <feDisplacementMap in="SourceGraphic" scale="8"/>
-    </filter>
-    <filter id="soft" x="-5%" y="-50%" width="110%" height="200%"><feGaussianBlur stdDeviation="2"/></filter>
     <clipPath id="ice">
-      <path d="M205 0 L240 72 L262 52 L298 170 L318 300 L336 463 L372 640 L388 820 L362 1030 L318 1240 L262 1410 L212 1500 L160 1420 L104 1260 L48 1060 L14 830 L30 640 L62 463 L88 330 L128 210 L150 132 L182 60 Z"/>
+      <path d="M150 40 L190 0 L222 46 L262 18 L300 92 L330 190 L350 320 L392 430 L398 560 L380 700 L340 820 L280 930 L200 990 L120 950 L60 850 L18 710 L4 560 L14 430 L50 320 L74 210 L110 110 Z"/>
     </clipPath>
     <!-- Вода над подводной частью: чем глубже, тем темнее -->
-    <linearGradient id="depth" x1="0" y1="455" x2="0" y2="1500" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#5c96dc" stop-opacity="0.3"/>
-      <stop offset="0.45" stop-color="#463f86" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#2a2a4a" stop-opacity="0.82"/>
+    <linearGradient id="depth" x1="0" y1="316" x2="0" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5c96dc" stop-opacity="0.28"/>
+      <stop offset="0.5" stop-color="#463f86" stop-opacity="0.52"/>
+      <stop offset="1" stop-color="#2a2a4a" stop-opacity="0.78"/>
     </linearGradient>
   </defs>
 
-  <g filter="url(#brush)">
-    <g clip-path="url(#ice)">
-      <rect width="400" height="1500" fill="#ffffff"/>
-      <!-- Надводные грани: свет слева -->
-      <path d="M205 0 L240 72 L262 52 L298 170 L318 300 L336 463 L252 463 L232 240 Z" fill="#cfe2f7"/>
-      <path d="M205 0 L232 240 L252 463 L182 463 L172 210 Z" fill="#eaf3fd"/>
-      <path d="M128 210 L172 210 L182 463 L120 463 Z" fill="#f6faff"/>
-      <!-- Подводные грани -->
-      <path d="M336 463 L372 640 L388 820 L362 1030 L318 1240 L262 1410 L238 900 L252 463 Z" fill="#b9d4f2"/>
-      <path d="M252 463 L238 900 L262 1410 L212 1500 L160 1420 L176 900 L182 463 Z" fill="#d8e8fa"/>
-      <path d="M62 463 L120 463 L104 760 L30 640 Z" fill="#eaf3fd"/>
-      <path d="M14 830 L104 760 L176 900 L104 1260 L48 1060 Z" fill="#cfe2f7"/>
-      <!-- Вода поверх подводной части: граница — неровная волна -->
-      <path d="M0 470 C24 452 44 460 66 466 C90 472 102 448 132 454 C158 460 170 474 200 468 C226 462 238 444 268 452 C292 458 304 476 334 466 C356 458 376 460 400 468 L400 1500 L0 1500 Z" fill="url(#depth)"/>
-    </g>
-  </g>
-  <!-- Пена у кромки воды -->
   <g clip-path="url(#ice)">
-    <path d="M0 470 C24 452 44 460 66 466 C90 472 102 448 132 454 C158 460 170 474 200 468 C226 462 238 444 268 452 C292 458 304 476 334 466 C356 458 376 460 400 468" fill="none" stroke="#ffffff" stroke-width="5" stroke-dasharray="60 10 90 14 70 12" opacity="0.9" filter="url(#soft)"/>
+    <rect width="400" height="1000" fill="#ffffff"/>
+    <!-- Надводные грани: свет слева -->
+    <path d="M262 18 L300 92 L330 190 L350 320 L252 320 L240 120 Z" fill="#cfe2f7"/>
+    <path d="M190 0 L222 46 L240 120 L252 320 L172 320 L160 90 Z" fill="#eaf3fd"/>
+    <path d="M110 110 L160 90 L172 320 L50 320 L74 210 Z" fill="#f7fbff"/>
+    <!-- Подводные грани -->
+    <path d="M350 320 L392 430 L398 560 L380 700 L340 820 L280 930 L252 600 L252 320 Z" fill="#b9d4f2"/>
+    <path d="M252 320 L252 600 L280 930 L200 990 L150 900 L172 600 L172 320 Z" fill="#d8e8fa"/>
+    <path d="M14 430 L4 560 L18 710 L60 850 L120 950 L150 900 L96 640 Z" fill="#cfe2f7"/>
+    <!-- Вода поверх подводной части: граница — плавная волна -->
+    <path d="M0 324 C30 314 60 316 90 322 C130 330 160 314 200 318 C240 322 270 332 310 322 C340 314 370 316 400 322 L400 1000 L0 1000 Z" fill="url(#depth)"/>
+    <!-- Пена у кромки воды -->
+    <path d="M0 324 C30 314 60 316 90 322 C130 330 160 314 200 318 C240 322 270 332 310 322 C340 314 370 316 400 322" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" vector-effect="non-scaling-stroke" opacity="0.9"/>
   </g>
 </svg>
