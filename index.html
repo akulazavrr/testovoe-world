@@ -83,7 +83,12 @@
 
       <button class="map-object map-object--kilka" type="button" data-section="kilka">
         <span class="map-object__art map-object__art--kilka">
-          <img class="kilka-fish" src="assets/map/fish.svg" alt="" width="120" height="80">
+          <!-- Килька выпрыгивает из воды: всё, что ниже линии воды, обрезано -->
+          <span class="kilka-jump">
+            <img class="kilka-fish" src="assets/map/fish.svg" alt="" width="120" height="80">
+          </span>
+          <span class="kilka-ripple"></span>
+          <span class="kilka-ripple kilka-ripple--out"></span>
           <img class="kilka-tomato kilka-tomato--1" src="assets/map/tomato.svg" alt="" width="64" height="60">
           <img class="kilka-tomato kilka-tomato--2" src="assets/map/tomato.svg" alt="" width="64" height="60">
           <img class="kilka-tomato kilka-tomato--3" src="assets/map/tomato.svg" alt="" width="64" height="60">

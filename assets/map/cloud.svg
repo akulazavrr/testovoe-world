@@ -1,18 +1,74 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 160"><defs>
-  <radialGradient id="lobe" cx="0.5" cy="0.5" r="0.5" fx="0.4" fy="0.34">
-    <stop offset="0" stop-color="#ffffff"/>
-    <stop offset="0.6" stop-color="#ffffff"/>
-    <stop offset="0.84" stop-color="#f1f5fc"/>
-    <stop offset="0.96" stop-color="#d4e1f5"/>
-    <stop offset="1" stop-color="#c3d5f1"/>
-  </radialGradient>
-  <filter id="pencil" x="-5%" y="-5%" width="110%" height="110%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.9 0.12" numOctaves="2" seed="2" result="n"/>
-    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.66  0 0 0 0 0.88  0 0 0 0.3 0" result="tint"/>
-    <feComposite in="tint" in2="SourceAlpha" operator="in" result="tex"/>
-    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="6" result="warp"/>
-    <feDisplacementMap in="SourceGraphic" in2="warp" scale="3" result="shape"/>
-    <feMerge><feMergeNode in="shape"/><feMergeNode in="tex"/></feMerge>
-  </filter>
-</defs>
-<g filter="url(#pencil)"><circle cx="89.3" cy="66" r="18.8" fill="url(#lobe)"/><circle cx="65" cy="70.3" r="20.8" fill="url(#lobe)"/><circle cx="103.1" cy="73.7" r="20.5" fill="url(#lobe)"/><circle cx="55.6" cy="81.3" r="20.9" fill="url(#lobe)"/><circle cx="110.7" cy="93.6" r="18.7" fill="url(#lobe)"/><circle cx="55.6" cy="102.7" r="19" fill="url(#lobe)"/><circle cx="105.9" cy="106.9" r="21.2" fill="url(#lobe)"/><circle cx="66.2" cy="114.5" r="21.5" fill="url(#lobe)"/><circle cx="84.6" cy="118.8" r="20.6" fill="url(#lobe)"/><circle cx="94.8" cy="95.7" r="17.3" fill="url(#lobe)"/><circle cx="82.2" cy="104.5" r="17.3" fill="url(#lobe)"/><circle cx="69.3" cy="96" r="17.3" fill="url(#lobe)"/><circle cx="73.9" cy="82" r="17.3" fill="url(#lobe)"/><circle cx="89.7" cy="81.8" r="17.3" fill="url(#lobe)"/><circle cx="80.1" cy="89.1" r="15.4" fill="url(#lobe)"/><circle cx="243.4" cy="68.4" r="19.4" fill="url(#lobe)"/><circle cx="227.3" cy="71.1" r="18" fill="url(#lobe)"/><circle cx="262.4" cy="78.9" r="17.5" fill="url(#lobe)"/><circle cx="213.4" cy="87" r="18.8" fill="url(#lobe)"/><circle cx="267.4" cy="91.1" r="20.1" fill="url(#lobe)"/><circle cx="213.7" cy="101.8" r="20.7" fill="url(#lobe)"/><circle cx="261.9" cy="109.7" r="17.9" fill="url(#lobe)"/><circle cx="228.5" cy="117.4" r="20.5" fill="url(#lobe)"/><circle cx="248.5" cy="118.5" r="18.1" fill="url(#lobe)"/><circle cx="252.3" cy="97.5" r="16.6" fill="url(#lobe)"/><circle cx="240.2" cy="106" r="16.6" fill="url(#lobe)"/><circle cx="227.8" cy="97.9" r="16.6" fill="url(#lobe)"/><circle cx="232.3" cy="84.4" r="16.6" fill="url(#lobe)"/><circle cx="247.4" cy="84.2" r="16.6" fill="url(#lobe)"/><circle cx="238.2" cy="91.2" r="14.7" fill="url(#lobe)"/><circle cx="164.3" cy="42.4" r="25.3" fill="url(#lobe)"/><circle cx="145.7" cy="44.7" r="28.8" fill="url(#lobe)"/><circle cx="188.7" cy="54.2" r="25.8" fill="url(#lobe)"/><circle cx="125.1" cy="63" r="27.4" fill="url(#lobe)"/><circle cx="198.3" cy="76.2" r="26" fill="url(#lobe)"/><circle cx="123.9" cy="90.1" r="26.5" fill="url(#lobe)"/><circle cx="192" cy="97.8" r="24.7" fill="url(#lobe)"/><circle cx="145.8" cy="111.3" r="28.8" fill="url(#lobe)"/><circle cx="165" cy="113.5" r="25.7" fill="url(#lobe)"/><circle cx="177.1" cy="82.9" r="23" fill="url(#lobe)"/><circle cx="160.3" cy="94.6" r="23" fill="url(#lobe)"/><circle cx="143" cy="83.4" r="23" fill="url(#lobe)"/><circle cx="149.3" cy="64.7" r="23" fill="url(#lobe)"/><circle cx="170.3" cy="64.4" r="23" fill="url(#lobe)"/><circle cx="157.4" cy="74.2" r="20.5" fill="url(#lobe)"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 160">
+  <!-- «Мемное облако» в технике акварели (референс docs/references/ref-6-watercolor-cloud.jpg).
+       Каждая часть облака — набор кругов; фильтр превращает их общий силуэт в акварельное пятно:
+       неровный край, тёмная голубая кромка, светлая середина, фактура бумаги. -->
+  <defs>
+    <filter id="wc" x="-10%" y="-15%" width="120%" height="130%" color-interpolation-filters="sRGB">
+      <!-- Неровный край -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="3" result="warp"/>
+      <feDisplacementMap in="SourceAlpha" in2="warp" scale="5" result="shape"/>
+      <!-- Голубая заливка всего пятна -->
+      <feFlood flood-color="#c4dbf3"/>
+      <feComposite in2="shape" operator="in" result="base"/>
+      <!-- Светлая середина: сжатый и размытый силуэт -->
+      <feMorphology in="shape" operator="erode" radius="11" result="inner"/>
+      <feGaussianBlur in="inner" stdDeviation="11" result="innerSoft"/>
+      <feFlood flood-color="#ffffff" flood-opacity="0.92"/>
+      <feComposite in2="innerSoft" operator="in"/>
+      <feComposite in2="shape" operator="in" result="white"/>
+      <!-- Тёмная кромка у края, как у высохшей акварели -->
+      <feMorphology in="shape" operator="erode" radius="1.5" result="rim"/>
+      <feGaussianBlur in="rim" stdDeviation="1" result="rimSoft"/>
+      <feComposite in="shape" in2="rimSoft" operator="out" result="edge"/>
+      <feFlood flood-color="#76a0d8" flood-opacity="0.85"/>
+      <feComposite in2="edge" operator="in" result="edgeColor"/>
+      <feMorphology in="shape" operator="erode" radius="5" result="band"/>
+      <feGaussianBlur in="band" stdDeviation="4" result="bandSoft"/>
+      <feComposite in="shape" in2="bandSoft" operator="out" result="bandEdge"/>
+      <feFlood flood-color="#9dbde6" flood-opacity="0.45"/>
+      <feComposite in2="bandEdge" operator="in" result="bandColor"/>
+      <!-- Фактура бумаги и разводы пигмента -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" seed="8" result="grain"/>
+      <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.6  0 0 0 0 0.85  0 0 0 0.28 -0.08" result="grainTint"/>
+      <feComposite in="grainTint" in2="shape" operator="in" result="paper"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="12" result="bloom"/>
+      <feColorMatrix in="bloom" type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.72  0 0 0 0 0.92  1.1 0 0 0 -0.45" result="bloomTint"/>
+      <feComposite in="bloomTint" in2="shape" operator="in" result="blooms"/>
+      <feMerge>
+        <feMergeNode in="base"/>
+        <feMergeNode in="blooms"/>
+        <feMergeNode in="white"/>
+        <feMergeNode in="bandColor"/>
+        <feMergeNode in="edgeColor"/>
+        <feMergeNode in="paper"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Дальнее большое облако -->
+  <g filter="url(#wc)" fill="#000">
+    <circle cx="44" cy="98" r="26"/>
+    <circle cx="82" cy="78" r="34"/>
+    <circle cx="128" cy="62" r="42"/>
+    <circle cx="176" cy="74" r="30"/>
+    <rect x="18" y="92" width="190" height="44" rx="22"/>
+  </g>
+
+  <!-- Облако справа сверху -->
+  <g filter="url(#wc)" fill="#000">
+    <circle cx="190" cy="58" r="24"/>
+    <circle cx="226" cy="52" r="20"/>
+    <circle cx="228" cy="76" r="26"/>
+    <circle cx="258" cy="70" r="24"/>
+    <circle cx="288" cy="96" r="22"/>
+    <rect x="176" y="70" width="128" height="52" rx="24"/>
+  </g>
+
+  <!-- Переднее облако в центре -->
+  <g filter="url(#wc)" fill="#000">
+    <circle cx="132" cy="108" r="26"/>
+    <circle cx="170" cy="92" r="32"/>
+    <circle cx="210" cy="108" r="26"/>
+    <rect x="110" y="106" width="124" height="38" rx="19"/>
+  </g>
+</svg>
