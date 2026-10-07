@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 38">
+  <!-- Дверь домика. Открывается поворотом вокруг левого края -->
+  <rect x="0" y="0" width="22" height="38" rx="3" fill="#6f9fdc"/>
+  <rect x="3" y="4" width="16" height="13" rx="2" fill="#8bb4e8"/>
+  <rect x="3" y="20" width="16" height="14" rx="2" fill="#7aa8e2"/>
+  <circle cx="17" cy="22" r="2" fill="#fdffb6"/>
+</svg>

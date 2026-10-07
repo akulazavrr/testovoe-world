@@ -1,4 +1,369 @@
-/* Раздел «Домик: спецпроект «Качок Кабачок». Задание: docs/02-house.md» */
+/* Раздел «Качок Кабачок» (домик). Задание: docs/02-house.md
+   Слои: интерьер (фон) → затемнение → поп-ап с двумя страницами. */
 
 .section--house {
+  overflow: hidden; /* скроллится содержимое страницы внутри поп-апа, а не раздел */
+  background: #2b2238;
+}
+
+.house {
+  --popup-fade: 300ms; /* должно совпадать с FADE_MS в js/house.js */
+
+  position: absolute;
+  inset: 0;
+  /* clip, а не hidden: такой блок нельзя прокрутить даже программно,
+     поэтому анимация перелистывания не сдвигает поп-ап */
+  overflow: clip;
+}
+
+.house [hidden] {
+  display: none !important;
+}
+
+/* ---------- Интерьер ---------- */
+
+.house__interior {
+  position: absolute;
+  inset: -3%;
+  background: url('../assets/house/interior.svg') center / cover no-repeat;
+  transition: filter 400ms var(--ease);
+}
+
+/* Зерно бумаги, как на карте */
+.house__interior::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.28;
+  mix-blend-mode: multiply;
+  background-image: var(--grain);
+}
+
+/* Пока поп-ап открыт, интерьер слегка размыт и затемнён, чтобы текст читался */
+.house.is-popup-open .house__interior {
+  filter: blur(5px) brightness(0.88);
+}
+
+.house__dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 24, 44, 0.3);
+  opacity: 0;
+  transition: opacity var(--popup-fade) var(--ease);
+}
+
+.house.is-popup-open .house__dim {
+  opacity: 1;
+}
+
+/* Вход в дом: интерьер «надвигается», как будто проходим в дверь */
+.house.is-entering .house__interior {
+  animation: house-enter 600ms var(--ease) backwards;
+}
+
+@keyframes house-enter {
+  from { opacity: 0; transform: scale(1.25); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Кнопка, которая снова открывает поп-ап, когда его закрыли крестиком */
+.house__reopen {
+  position: absolute;
+  left: 50%;
+  bottom: 12vh;
+  z-index: 2;
+  min-height: 52px;
+  padding: 14px 28px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--c-text);
+  background: var(--c-white);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(30, 24, 44, 0.35);
+  transform: translateX(-50%);
+  transition: scale 180ms var(--ease);
+}
+
+.house__reopen:hover {
+  scale: 1.04;
+}
+
+/* ---------- Поп-ап ---------- */
+
+.house__popup {
+  position: absolute;
+  top: 72px; /* над поп-апом — место для кнопки «На карту» */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px 24px 0 0;
+  background: var(--c-white);
+  box-shadow: 0 -10px 40px rgba(30, 24, 44, 0.3);
+  opacity: 0;
+  translate: 0 24px;
+  transition: opacity var(--popup-fade) var(--ease), translate var(--popup-fade) var(--ease);
+}
+
+.house__popup.is-visible {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.house__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--c-text);
+  background: #eef2fa;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+
+.house__close:hover {
+  background: var(--c-blue);
+}
+
+/* ---------- Страницы ---------- */
+
+.house__pages {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: clip;
+}
+
+/* Если текст не помещается, скроллится страница внутри поп-апа */
+.house__page {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 56px var(--gutter) 32px;
+}
+
+.house__page:focus {
+  outline: none;
+}
+
+.house__page.is-entering-next {
+  animation: house-page-next 320ms var(--ease);
+}
+
+.house__page.is-entering-prev {
+  animation: house-page-prev 320ms var(--ease);
+}
+
+@keyframes house-page-next {
+  from { opacity: 0; translate: 40px 0; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+@keyframes house-page-prev {
+  from { opacity: 0; translate: -40px 0; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+/* Страница 1: одна колонка не шире 720px */
+.house__column {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Страница 2: блоки; на десктопе — в две колонки */
+.house__grid {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ---------- Типографика ---------- */
+
+.house__name {
+  margin-bottom: 8px;
+  font-size: clamp(2rem, 1.3rem + 3.4vw, 3.75rem);
+  line-height: 1.05;
+}
+
+.house__name:focus {
+  outline: none;
+}
+
+.house__block {
+  margin-top: 28px;
+}
+
+/* Подзаголовок с мягкой «маркерной» подсветкой цвета кабачка */
+.house__h3 {
+  display: inline;
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  background: linear-gradient(180deg, transparent 58%, var(--c-mint) 58%);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.house__h4 {
+  margin: 16px 0 0;
+  font-size: var(--text-size);
+  font-weight: 700;
+}
+
+.house__p {
+  margin-top: 12px;
+  line-height: 1.55;
+}
+
+.house__list {
+  margin: 12px 0 0;
+  padding-left: 1.3em;
+  line-height: 1.5;
+}
+
+.house__list li + li {
+  margin-top: 8px;
+}
+
+.house__list--ordered li::marker {
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.house__list strong {
+  font-weight: 700;
+}
+
+/* ---------- Навигация ---------- */
+
+/* Внизу поп-апа; на телефоне это низ экрана — кнопка «Далее» всегда под рукой */
+.house__nav {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid #eef0f6;
+}
+
+.house__nav-side--end {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.house__indicator {
+  min-width: 3.5em;
+  color: #6b6b85;
+  font-weight: 700;
+  text-align: center;
+}
+
+.house__btn {
+  min-height: 48px;
+  padding: 12px 22px;
+  border: 2px solid var(--c-blue);
+  border-radius: 999px;
+  color: var(--c-text);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: scale 150ms var(--ease), background-color 150ms var(--ease);
+}
+
+.house__btn:hover {
+  scale: 1.04;
+}
+
+.house__btn--next {
+  background: var(--c-blue);
+}
+
+.house__btn--prev {
+  background: var(--c-white);
+}
+
+/* Боковые стрелки — только на десктопе; на телефоне их заменяет свайп */
+.house__arrow {
+  display: none;
+}
+
+/* ---------- Десктоп ---------- */
+
+@media (min-width: 768px) {
+  .house__popup {
+    top: 84px;
+    left: 40px;
+    right: 40px;
+    bottom: 32px;
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(30, 24, 44, 0.35);
+  }
+
+  .house__close {
+    top: 16px;
+    right: 16px;
+  }
+
+  .house__page {
+    padding: 56px 112px 40px;
+  }
+
+  .house__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 56px;
+    align-items: start;
+  }
+
+  .house__grid .house__block:first-child {
+    margin-top: 0;
+  }
+
+  .house__grid .house__block:nth-child(2) {
+    margin-top: 0;
+  }
+
+  .house__nav {
+    padding: 16px 32px;
+  }
+
+  .house__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border: 2px solid var(--c-blue);
+    border-radius: 50%;
+    color: var(--c-text);
+    background: var(--c-white);
+    font-size: 24px;
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition: background-color 150ms var(--ease);
+  }
+
+  .house__arrow:hover {
+    background: var(--c-blue);
+  }
+
+  .house__arrow--prev {
+    left: 24px;
+  }
+
+  .house__arrow--next {
+    right: 24px;
+  }
 }

@@ -134,10 +134,20 @@ for (const [name, module] of Object.entries(modules)) {
   module.init(sectionRoot(name), content);
 }
 
-map.addEventListener('click', (event) => {
+// Раздел может сыграть свою анимацию на карте до открытия (beforeOpen),
+// например, домик открывает дверь
+let opening = false;
+
+map.addEventListener('click', async (event) => {
   const button = event.target.closest('.map-object');
-  if (!button) return;
+  if (!button || opening) return;
   const name = button.dataset.section;
+  opening = true;
+  try {
+    await modules[name].beforeOpen?.(button);
+  } finally {
+    opening = false;
+  }
   history.pushState({ fromMap: true }, '', `#${name}`);
   openSection(name);
 });

@@ -39,12 +39,11 @@
     <rect x="56" y="137" width="32" height="5" rx="2" fill="#c9b49a"/>
   </g>
 
-  <!-- Дверь -->
-  <g id="door">
-    <rect x="61" y="100" width="22" height="38" rx="3" fill="#6f9fdc"/>
-    <rect x="64" y="104" width="16" height="13" rx="2" fill="#8bb4e8"/>
-    <circle cx="78" cy="122" r="2" fill="#fdffb6"/>
-  </g>
+  <!-- Дверной проём: тёплый свет изнутри. Сама дверь — отдельная картинка door.svg поверх,
+       её открывает анимация (css/map.css, .is-door-open) -->
+  <rect x="61" y="100" width="22" height="38" rx="3" fill="#fff0b8"/>
+  <rect x="61" y="100" width="22" height="38" rx="3" fill="#f5c26b" opacity="0.55"/>
+  <path d="M61 138 L83 138 L83 128 Z" fill="#e0a95a" opacity="0.6"/>
 
   <!-- Свет из окон -->
   <circle cx="44" cy="98" r="14" fill="#fdffb6" opacity="0.35" filter="url(#glow)"/>

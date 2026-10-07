@@ -252,6 +252,23 @@
   transform: scale(var(--hover-scale));
 }
 
+/* Дверь домика — поверх проёма (в house.svg проём: x 61–83, y 100–138 из 170×150).
+   При входе в раздел открывается внутрь, при возвращении на карту закрывается. */
+.map-object__art .house-door {
+  position: absolute;
+  left: 35.88%;
+  top: 66.67%;
+  width: 12.94%;
+  height: 25.33%;
+  transform-origin: 0 50%;
+  transform: perspective(120px) rotateY(0deg);
+  transition: transform 500ms var(--ease);
+}
+
+.map-object--house.is-door-open .house-door {
+  transform: perspective(120px) rotateY(-78deg);
+}
+
 /* Айсберг качается на воде */
 .map-object__art--iceberg {
   animation: bob 4.2s ease-in-out infinite;
