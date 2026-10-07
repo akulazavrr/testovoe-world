@@ -86,9 +86,20 @@ function hideSectionNow(name) {
   sectionRoot(name).hidden = true;
 }
 
-function closeSection() {
-  if (!current) return;
+// Раздел может сыграть свою анимацию перед закрытием (beforeClose),
+// например, части мемного облака слетаются обратно на карту
+let closing = false;
+
+async function closeSection() {
+  if (!current || closing) return;
   const name = current;
+  closing = true;
+  try {
+    await modules[name].beforeClose?.();
+  } finally {
+    closing = false;
+  }
+  if (current !== name) return; // пока шла анимация, открыли другой раздел
   current = null;
 
   modules[name].onClose?.();
@@ -156,7 +167,7 @@ map.addEventListener('click', async (event) => {
 backButton.addEventListener('click', requestClose);
 
 document.addEventListener('keydown', (event) => {
-  if (event.key !== 'Escape' || !current) return;
+  if (event.key !== 'Escape' || !current || closing) return;
   if (modules[current].onEscape?.()) return;
   requestClose();
 });
