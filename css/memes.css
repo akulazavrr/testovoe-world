@@ -89,7 +89,9 @@
 }
 
 .memes__title {
+  color: var(--c-white);
   font-size: clamp(1.75rem, 1.2rem + 2.5vw, 3rem);
+  text-shadow: var(--shadow-on-image);
 }
 
 .memes__title:focus {

@@ -35,8 +35,11 @@
   text-align: center;
 }
 
+/* Белый заголовок с мягкой тенью, как на всех экранах (решение автора, «на пробу») */
 .map__title {
+  color: var(--c-white);
   font-size: clamp(1.375rem, 0.9rem + 2.4vw, 3.25rem);
+  text-shadow: var(--shadow-on-image);
 }
 
 .map__subtitle {
@@ -104,13 +107,21 @@
   transform: translate(-50%, -96%);
 }
 
-/* Деревья стоят на траве, не ближе к воде, чем 60% (вода начинается с 64%) */
-.tree--a { --x: 7%;  --y: 60%; --h: min(28vh, 38vw); }
-.tree--b { --x: 20%; --y: 53%; --h: min(22vh, 30vw); }
-.tree--c { --x: 31%; --y: 45%; --h: min(9vh, 15vw); }
+/* Деревья стоят на траве, не ближе к воде, чем 61% (вода начинается с 64%).
+   В разметке они идут от дальних к ближним, чтобы ближние перекрывали дальние. */
+.tree--h { --x: 40%; --y: 42%; --h: min(8vh, 13vw); }
+.tree--i { --x: 60%; --y: 42%; --h: min(8vh, 13vw); }
+.tree--m { --x: 13%; --y: 44%; --h: min(9vh, 14vw); }
 .tree--d { --x: 69%; --y: 44%; --h: min(9vh, 15vw); }
+.tree--c { --x: 31%; --y: 45%; --h: min(9vh, 15vw); }
+.tree--l { --x: 97%; --y: 46%; --h: min(12vh, 18vw); }
+.tree--g { --x: 3%;  --y: 47%; --h: min(10vh, 16vw); }
 .tree--e { --x: 82%; --y: 52%; --h: min(22vh, 30vw); }
-.tree--f { --x: 94%; --y: 60%; --h: min(28vh, 38vw); }
+.tree--b { --x: 20%; --y: 53%; --h: min(22vh, 30vw); }
+.tree--j { --x: 36%; --y: 60%; --h: min(12vh, 19vw); }
+.tree--k { --x: 66%; --y: 60%; --h: min(12vh, 19vw); }
+.tree--a { --x: 7%;  --y: 60%; --h: min(28vh, 38vw); }
+.tree--f { --x: 94%; --y: 61%; --h: min(28vh, 38vw); }
 
 /* ---------- Объекты-кнопки ---------- */
 
@@ -196,7 +207,7 @@
 .map-object--iceberg {
   --x: 27%;
   --y: 76%;
-  --w: min(40vw, 25vh);
+  --w: min(44vw, 26vh);
 }
 
 .map-object--kilka {
@@ -271,6 +282,7 @@
 
 /* Айсберг качается на воде */
 .map-object__art--iceberg {
+  filter: none; /* у картинки своя водная «лужица» — тень под ней не нужна */
   animation: bob 4.2s ease-in-out infinite;
 }
 
@@ -391,7 +403,7 @@
 
   .map-object--memes   { --w: min(46vw, 40vh); --y: 16%; }
   .map-object--house   { --w: min(26vw, 22vh); }
-  .map-object--iceberg { --w: min(28vw, 28vh); --x: 26%; }
+  .map-object--iceberg { --w: min(30vw, 30vh); --x: 26%; }
   .map-object--kilka   { --w: min(30vw, 27vh); --x: 72%; }
 }
 
