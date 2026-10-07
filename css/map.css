@@ -264,17 +264,17 @@
   50%      { transform: translateY(5%) rotate(1.5deg); }
 }
 
-/* Килька и томаты парят вверх-вниз, каждый в своём ритме */
+/* Килька и томаты выпрыгивают из воды вместе */
 .map-object__art--kilka {
   aspect-ratio: 3 / 2;
 }
 
 /* Линия воды внутри объекта — на 74% его высоты. Всё, что ниже, обрезано,
-   поэтому килька появляется из воды и уходит обратно. */
+   поэтому килька и томаты появляются из воды и уходят обратно. */
 .kilka-jump {
   position: absolute;
   inset: 0;
-  clip-path: inset(-60% -30% 26% -30%);
+  clip-path: inset(-80% -40% 26% -40%);
 }
 
 .kilka-fish {
@@ -285,17 +285,17 @@
   animation: kilka-jump 4.8s ease-in-out infinite;
 }
 
-/* Выныривает слева, зависает в верхней точке, ныряет справа.
-   Под водой (последние кадры) возвращается назад незаметно. */
+/* Выныривает головой вверх слева, высоко взлетает, ныряет головой вниз справа.
+   Под водой (последние кадры) незаметно возвращается назад. */
 @keyframes kilka-jump {
-  0%   { transform: translate(-22%, 95%) rotate(-38deg); }
-  14%  { transform: translate(-14%, 30%) rotate(-30deg); }
-  32%  { transform: translate(-4%, -6%) rotate(-12deg); }
-  48%  { transform: translate(2%, -12%) rotate(0deg); }
-  62%  { transform: translate(8%, -6%) rotate(12deg); }
-  80%  { transform: translate(18%, 40%) rotate(32deg); }
-  90%  { transform: translate(22%, 95%) rotate(38deg); }
-  100% { transform: translate(-22%, 95%) rotate(-38deg); }
+  0%   { transform: translate(-24%, 110%) rotate(-42deg); }
+  14%  { transform: translate(-16%, 30%) rotate(-40deg); }
+  30%  { transform: translate(-6%, -32%) rotate(-24deg); }
+  46%  { transform: translate(2%, -48%) rotate(0deg); }
+  60%  { transform: translate(10%, -34%) rotate(30deg); }
+  76%  { transform: translate(18%, 20%) rotate(62deg); }
+  88%  { transform: translate(22%, 110%) rotate(72deg); }
+  100% { transform: translate(-24%, 110%) rotate(-42deg); }
 }
 
 /* Круги на воде там, где килька выныривает и ныряет */
@@ -312,8 +312,8 @@
 }
 
 .kilka-ripple--out {
-  left: 54%;
-  animation-delay: 3.4s;
+  left: 56%;
+  animation-delay: 3.95s;
 }
 
 @keyframes kilka-ripple {
@@ -323,21 +323,28 @@
   100% { opacity: 0;   transform: scale(1.3); }
 }
 
-/* Томаты однотонные, каждый повёрнут по-своему, чтобы хвостики смотрели в разные стороны.
-   rotate — отдельное свойство, оно не мешает анимации парения (transform). */
+/* Томаты выпрыгивают вместе с килькой и кувыркаются в полёте.
+   --turn — свой начальный поворот, чтобы хвостики смотрели в разные стороны;
+   --depth — насколько глубоко под водой томат прячется между прыжками. */
 .kilka-tomato {
   position: absolute;
   width: 24% !important;
-  animation: hover-float 2.4s ease-in-out infinite;
+  animation: tomato-jump 4.8s ease-in-out infinite;
 }
 
-.kilka-tomato--1 { left: 0;   top: 0;   rotate: -38deg; animation-duration: 2.6s; }
-.kilka-tomato--2 { left: 74%; top: 2%;  rotate: 52deg;  animation-duration: 3.4s; animation-delay: -1s; }
-.kilka-tomato--3 { left: 70%; top: 50%; rotate: 160deg; animation-duration: 2.9s; animation-delay: -2s; }
+.kilka-tomato--1 { left: 4%;  top: 26%; --turn: -38deg; --depth: 260%; animation-delay: 0.12s; }
+.kilka-tomato--2 { left: 44%; top: 6%;  --turn: 52deg;  --depth: 320%; animation-delay: -0.18s; }
+.kilka-tomato--3 { left: 72%; top: 30%; --turn: 160deg; --depth: 250%; animation-delay: 0.3s; }
 
-@keyframes hover-float {
-  0%, 100% { transform: translateY(-6%); }
-  50%      { transform: translateY(6%); }
+@keyframes tomato-jump {
+  0%   { transform: translate(-30%, var(--depth)) rotate(var(--turn)); }
+  14%  { transform: translate(-20%, calc(var(--depth) * 0.3)) rotate(calc(var(--turn) + 40deg)); }
+  30%  { transform: translate(-5%, -60%) rotate(calc(var(--turn) + 90deg)); }
+  46%  { transform: translate(10%, -90%) rotate(calc(var(--turn) + 140deg)); }
+  62%  { transform: translate(25%, -60%) rotate(calc(var(--turn) + 190deg)); }
+  80%  { transform: translate(45%, 120%) rotate(calc(var(--turn) + 250deg)); }
+  90%  { transform: translate(55%, var(--depth)) rotate(calc(var(--turn) + 280deg)); }
+  100% { transform: translate(-30%, var(--depth)) rotate(var(--turn)); }
 }
 
 /* ---------- Десктоп: объекты крупнее, расстояния больше ---------- */
@@ -381,9 +388,13 @@
     transform: none;
   }
 
-  /* Килька неподвижно висит в верхней точке прыжка, без кругов на воде */
+  /* Килька и томаты неподвижно висят над водой, без кругов на воде */
   .kilka-fish {
     transform: translate(2%, -12%);
+  }
+
+  .kilka-tomato {
+    transform: rotate(var(--turn));
   }
 
   .kilka-ripple {

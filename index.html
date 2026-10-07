@@ -62,7 +62,7 @@
       <!-- Объекты: кнопки, открывающие разделы -->
       <button class="map-object map-object--memes" type="button" data-section="memes">
         <span class="map-object__art map-object__art--cloud">
-          <img src="assets/map/cloud.svg" alt="" width="320" height="160">
+          <img src="assets/map/cloud.png" alt="" width="920" height="423">
         </span>
         <span class="map-object__label" data-text="sections.memes.mapLabel"></span>
       </button>
@@ -83,15 +83,15 @@
 
       <button class="map-object map-object--kilka" type="button" data-section="kilka">
         <span class="map-object__art map-object__art--kilka">
-          <!-- Килька выпрыгивает из воды: всё, что ниже линии воды, обрезано -->
-          <span class="kilka-jump">
-            <img class="kilka-fish" src="assets/map/fish.svg" alt="" width="120" height="80">
-          </span>
           <span class="kilka-ripple"></span>
           <span class="kilka-ripple kilka-ripple--out"></span>
-          <img class="kilka-tomato kilka-tomato--1" src="assets/map/tomato.svg" alt="" width="64" height="60">
-          <img class="kilka-tomato kilka-tomato--2" src="assets/map/tomato.svg" alt="" width="64" height="60">
-          <img class="kilka-tomato kilka-tomato--3" src="assets/map/tomato.svg" alt="" width="64" height="60">
+          <!-- Килька и томаты выпрыгивают из воды вместе: всё, что ниже линии воды, обрезано -->
+          <span class="kilka-jump">
+            <img class="kilka-tomato kilka-tomato--1" src="assets/map/tomato.svg" alt="" width="64" height="60">
+            <img class="kilka-fish" src="assets/map/fish.svg" alt="" width="120" height="80">
+            <img class="kilka-tomato kilka-tomato--2" src="assets/map/tomato.svg" alt="" width="64" height="60">
+            <img class="kilka-tomato kilka-tomato--3" src="assets/map/tomato.svg" alt="" width="64" height="60">
+          </span>
         </span>
         <span class="map-object__label" data-text="sections.kilka.mapLabel"></span>
       </button>
