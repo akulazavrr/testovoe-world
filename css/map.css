@@ -118,8 +118,6 @@
 .tree--g { --x: 3%;  --y: 47%; --h: min(10vh, 16vw); }
 .tree--e { --x: 82%; --y: 52%; --h: min(22vh, 30vw); }
 .tree--b { --x: 20%; --y: 53%; --h: min(22vh, 30vw); }
-.tree--j { --x: 36%; --y: 60%; --h: min(12vh, 19vw); }
-.tree--k { --x: 66%; --y: 60%; --h: min(12vh, 19vw); }
 .tree--a { --x: 7%;  --y: 60%; --h: min(28vh, 38vw); }
 .tree--f { --x: 94%; --y: 61%; --h: min(28vh, 38vw); }
 
