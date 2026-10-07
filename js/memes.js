@@ -1,30 +1,35 @@
 // Раздел «Мемное облако». Задание: docs/04-memes.md (+ правки автора)
 //
-// Облако с карты распадается на части, они разлетаются к краям экрана и становятся
-// рамкой неба: внизу и по бокам. Сверху светит солнце, три мема стоят дугой-улыбкой.
-// Клик по мему — крупный просмотр. При выходе части облака слетаются обратно на карту.
+// Облако с карты улетает к краю экрана, а из него «выдуваются» ещё несколько целых облаков:
+// вместе они становятся рамкой неба внизу и по бокам. Облака не режутся — только
+// отзеркаливаются и масштабируются. Сверху светит солнце, три мема стоят дугой-улыбкой.
+// Клик по мему — крупный просмотр. При выходе облака слетаются обратно на карту.
 
 import { el, prefersReducedMotion, sectionTitleId, setText } from './utils.js';
 
 const NAME = 'memes';
-const FLY_MS = 650;      // разлёт и сборка облака
+const FLY_MS = 650; // разлёт и сборка облаков
 
-// Части облака — круглые «пухлые» куски по его выпуклостям (эллипсы в долях картинки),
-// поэтому каждая часть сама похожа на облачко. cx, cy — центр куска, frac — его ширина.
-// to() — куда кусок улетает (в долях экрана) и какой ширины он там.
-const PIECES = [
-  { clip: 'ellipse(17% 40% at 17% 60%)', cx: 0.17, cy: 0.60, frac: 0.34,    // внизу слева
-    to: (vw, vh) => ({ x: 0.12 * vw, y: 0.94 * vh, w: Math.min(0.62 * vw, 0.55 * vh) }) },
-  { clip: 'ellipse(20% 44% at 37% 46%)', cx: 0.37, cy: 0.46, frac: 0.40,    // слева
-    to: (vw, vh) => ({ x: 0.03 * vw, y: 0.48 * vh, w: Math.min(0.44 * vw, 0.42 * vh) }) },
-  { clip: 'ellipse(19% 42% at 62% 40%)', cx: 0.62, cy: 0.40, frac: 0.38,    // справа
-    to: (vw, vh) => ({ x: 0.97 * vw, y: 0.32 * vh, w: Math.min(0.42 * vw, 0.4 * vh) }) },
-  { clip: 'ellipse(17% 44% at 84% 54%)', cx: 0.84, cy: 0.54, frac: 0.34,    // внизу справа
-    to: (vw, vh) => ({ x: 0.9 * vw, y: 0.95 * vh, w: Math.min(0.62 * vw, 0.55 * vh) }) },
+// Картинки облаков: путь и соотношение высоты к ширине
+const CLOUD_1 = { src: 'assets/map/cloud.png', ratio: 424 / 920 };
+const CLOUD_2 = { src: 'assets/memes/cloud-2.png', ratio: 561 / 920 };
+
+// Облака рамки. to() — центр облака (в долях экрана) и его ширина.
+// fromMap: true — это само облако с карты: стартует точно на его месте.
+// Остальные появляются маленькими из той же точки и вырастают по пути.
+const CLOUDS = [
+  { ...CLOUD_1, flip: false, fromMap: true,                       // справа сверху
+    to: (vw, vh) => ({ x: 1.0 * vw, y: 0.3 * vh, w: Math.min(0.62 * vw, 0.5 * vh) }) },
+  { ...CLOUD_2, flip: true,                                        // слева
+    to: (vw, vh) => ({ x: 0.0 * vw, y: 0.5 * vh, w: Math.min(0.62 * vw, 0.5 * vh) }) },
+  { ...CLOUD_1, flip: true,                                        // внизу слева
+    to: (vw, vh) => ({ x: 0.14 * vw, y: 0.97 * vh, w: Math.min(0.95 * vw, 0.85 * vh) }) },
+  { ...CLOUD_2, flip: false,                                       // внизу справа
+    to: (vw, vh) => ({ x: 0.88 * vw, y: 0.99 * vh, w: Math.min(0.95 * vw, 0.85 * vh) }) },
 ];
 
 let wrapper = null;
-let pieces = [];     // элементы частей облака
+let clouds = [];     // элементы облаков рамки
 let cards = [];      // кнопки мемов
 let lightbox = null;
 let lightboxImg = null;
@@ -34,43 +39,51 @@ function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Картинка облака на карте: откуда части разлетаются и куда возвращаются
+// Облако на карте: откуда облака разлетаются и куда возвращаются
 function mapCloud() {
   return document.querySelector('.map-object--memes .map-object__art');
 }
 
-// Ставит все части туда, где сейчас облако на карте (как одно целое облако)
-function placeOnCloud() {
-  const r = mapCloud().getBoundingClientRect();
-  for (const p of pieces) {
-    Object.assign(p.style, {
-      left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px`,
+// Ставит облака на их места в рамке (итоговое положение, без анимации)
+function placeAtEdges() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  clouds.forEach((node, i) => {
+    const c = CLOUDS[i];
+    const t = c.to(vw, vh);
+    const h = t.w * c.ratio;
+    Object.assign(node.style, {
+      left: `${t.x - t.w / 2}px`, top: `${t.y - h / 2}px`, width: `${t.w}px`, height: `${h}px`,
     });
-  }
-  return r;
+  });
 }
 
-// Преобразование, которое уносит ломоть i к краю экрана
-function edgeTransform(i, r) {
-  const piece = PIECES[i];
-  const t = piece.to(window.innerWidth, window.innerHeight);
-  const scale = t.w / (piece.frac * r.width);
-  const fromX = r.left + piece.cx * r.width;
-  const fromY = r.top + piece.cy * r.height;
-  return `translate(${t.x - fromX}px, ${t.y - fromY}px) scale(${scale})`;
+// Где облако i должно быть в начале разлёта (или в конце сборки): на облаке с карты
+function mapFrame(i) {
+  const c = CLOUDS[i];
+  const r = mapCloud().getBoundingClientRect();
+  const node = clouds[i];
+  const box = { x: parseFloat(node.style.left), y: parseFloat(node.style.top), w: parseFloat(node.style.width), h: parseFloat(node.style.height) };
+  const dx = r.left + r.width / 2 - (box.x + box.w / 2);
+  const dy = r.top + r.height / 2 - (box.y + box.h / 2);
+  const scale = c.fromMap ? r.width / box.w : (r.width / box.w) * 0.3;
+  return {
+    transform: `translate(${dx}px, ${dy}px) scale(${scale})`,
+    opacity: c.fromMap ? 1 : 0,
+  };
+}
+
+function edgeFrame(i) {
+  return { transform: CLOUDS[i].flip ? 'scaleX(-1)' : 'none', opacity: 1 };
 }
 
 function fly(toEdges) {
-  const r = placeOnCloud();
+  placeAtEdges();
   const reduced = prefersReducedMotion();
-  const animations = pieces.map((p, i) => {
-    p.getAnimations().forEach((a) => a.cancel());
-    const edge = edgeTransform(i, r);
-    const frames = toEdges
-      ? [{ transform: 'none' }, { transform: edge }]
-      : [{ transform: edge }, { transform: 'none' }];
-    p.style.transformOrigin = `${PIECES[i].cx * 100}% ${PIECES[i].cy * 100}%`;
-    return p.animate(frames, {
+  const animations = clouds.map((node, i) => {
+    node.getAnimations().forEach((a) => a.cancel());
+    const frames = toEdges ? [mapFrame(i), edgeFrame(i)] : [edgeFrame(i), mapFrame(i)];
+    return node.animate(frames, {
       duration: reduced ? 0 : FLY_MS,
       easing: 'cubic-bezier(0.33, 1, 0.68, 1)',
       fill: 'forwards',
@@ -79,16 +92,15 @@ function fly(toEdges) {
   return Promise.all(animations.map((a) => a.finished));
 }
 
-// При изменении размера окна части держатся у краёв
+// При изменении размера окна облака держатся у краёв
 function onResize() {
-  if (!wrapper.classList.contains('is-open')) return;
-  const r = placeOnCloud();
-  pieces.forEach((p, i) => {
-    p.getAnimations().forEach((a) => a.cancel());
-    p.style.transform = edgeTransform(i, r);
+  if (!wrapper.classList.contains('is-open') || wrapper.classList.contains('is-leaving')) return;
+  placeAtEdges();
+  clouds.forEach((node, i) => {
+    node.getAnimations().forEach((a) => a.cancel());
+    Object.assign(node.style, edgeFrame(i));
   });
 }
-
 // ---------- Крупный просмотр ----------
 
 function openLightbox(card, item) {
@@ -112,10 +124,9 @@ function closeLightbox() {
 export function init(sectionRoot, content) {
   const data = content.sections[NAME];
 
-  pieces = PIECES.map((piece) =>
-    el('div', { className: 'memes__piece', attrs: { 'aria-hidden': 'true' } }),
+  clouds = CLOUDS.map((c) =>
+    el('img', { className: 'memes__cloud', src: c.src, alt: '', loading: 'lazy', decoding: 'async' }),
   );
-  pieces.forEach((p, i) => { p.style.clipPath = PIECES[i].clip; });
 
   cards = data.items.map((item, i) => {
     const card = el('button', {
@@ -144,7 +155,7 @@ export function init(sectionRoot, content) {
       el('div', { className: 'memes__rays' }),
       el('div', { className: 'memes__sun' }),
     ]),
-    ...pieces,
+    ...clouds,
     el('header', { className: 'memes__header' }, [
       el('h2', { className: 'memes__title', id: sectionTitleId(NAME), tabIndex: -1, text: data.title }),
       setText(el('p', { className: 'memes__subtitle' }), data.subtitle),
@@ -161,16 +172,16 @@ export function onOpen() {
   closeLightbox();
   wrapper.classList.remove('is-leaving');
   wrapper.classList.add('is-open');
-  mapCloud().style.visibility = 'hidden'; // вместо облака на карте — его части в разделе
+  mapCloud().style.visibility = 'hidden'; // облако с карты теперь летает в разделе
   fly(true);
 
-  // Мемы появляются по очереди, когда облако уже разлетелось
+  // Мемы появляются по очереди, когда облака уже разлетелись
   wrapper.classList.remove('is-entering');
   void wrapper.offsetWidth;
   wrapper.classList.add('is-entering');
 }
 
-// Перед выходом: мемы и небо исчезают, части облака слетаются обратно на карту
+// Перед выходом: мемы и небо исчезают, облака слетаются обратно в облако на карте
 export async function beforeClose() {
   if (!lightbox.hidden) closeLightbox();
   wrapper.classList.add('is-leaving');

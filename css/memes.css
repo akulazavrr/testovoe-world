@@ -55,14 +55,14 @@
   to { rotate: 360deg; }
 }
 
-/* ---------- Части облака ----------
-   Положение и полёт задаются в js/memes.js; здесь — только картинка */
-.memes__piece {
+/* ---------- Облака рамки ----------
+   Целые облака (не разрезанные). Положение и полёт задаются в js/memes.js */
+.memes__cloud {
   position: absolute;
   z-index: 1;
-  background: url('../assets/map/cloud.png') center / 100% 100% no-repeat;
+  max-width: none;
   pointer-events: none;
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 /* ---------- Заголовок ---------- */
