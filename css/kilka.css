@@ -1,138 +1,128 @@
-/* Раздел «Килька в томате» — шуточная презентация. Задание: docs/03-kilka.md
-   Десктоп: слева слайды (~60%), справа закреплённая колонка с демоном (~40%).
-   Телефон: текст на всю ширину, демон маленький у правого края, нитка с банкой — вдоль края. */
+/* Раздел «Килька в томате» — по вёрстке автора (docs/references/ref-19-kilka-layout.pdf).
+   Макет шириной 1937px, поэтому размеры на десктопе заданы в vw: 1vw ≈ 19.4px макета.
+   Слои: фон → нитка (z 1) → демон, банки (z 2) → текст (z 3). */
 
 .section--kilka {
-  color: #fff6ee;
-  background:
-    radial-gradient(120% 80% at 80% 0%, rgba(232, 119, 109, 0.18), transparent 60%),
-    linear-gradient(180deg, #23233f 0%, #2a2346 55%, #1e1b33 100%);
+  background: #6b0000;
 }
 
 .kilka {
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr;
+  overflow: clip;
+  padding-bottom: 9vw;
+  color: var(--c-white);
+  /* Красный: тёмный по краям, ярче в середине, как в макете */
+  background:
+    radial-gradient(ellipse 55% 14% at 48% 30%, rgba(214, 0, 0, 0.85), transparent 75%),
+    radial-gradient(ellipse 55% 16% at 46% 62%, rgba(210, 0, 0, 0.8), transparent 75%),
+    linear-gradient(90deg, #6b0000 0%, #990000 22%, #a80000 50%, #990000 78%, #6b0000 100%);
 }
 
-/* Зерно бумаги, как на карте */
-.kilka::after {
-  content: '';
+/* ---------- Нитка йо-йо: от руки демона к маленькой банке в конце (статично) ---------- */
+
+.kilka__string {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  opacity: 0.18;
-  mix-blend-mode: screen;
-  background-image: var(--grain);
-}
-
-/* ---------- Слайды ---------- */
-
-.kilka__slides {
-  position: relative;
   z-index: 1;
-  /* справа место под нитку с банкой */
-  padding-right: 64px;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
+  stroke: #2b0505;
+  stroke-width: 2.5px;
+  stroke-linecap: round;
 }
 
-/* Каждый слайд — примерно экран по высоте */
+/* Демон наверху справа, отзеркален: держит нитку левой рукой, как в макете */
+.kilka__demon {
+  position: absolute;
+  top: 5vw;
+  left: 77.5vw;
+  z-index: 2;
+  width: 16.5vw;
+  max-width: none;
+  transform: scaleX(-1);
+}
+
+/* ---------- Текст ---------- */
+
+.kilka__cover,
 .kilka__slide {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 100vh;
-  min-height: 100dvh;
-  padding: 96px var(--gutter) 64px;
-}
-
-.kilka__slide-inner {
-  max-width: 34em;
-}
-
-/* Обложка */
-.kilka__slide--cover {
   position: relative;
+  z-index: 3;
+  padding: 0 4.5vw;
+}
+
+.kilka__cover {
+  padding-top: 11.5vw;
 }
 
 .kilka__kicker {
-  margin-bottom: 16px;
-  color: var(--c-coral);
   font-family: var(--font-heading);
-  font-size: 0.875rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: clamp(1rem, 2vw, 2.375rem);
+  font-weight: 500;
 }
 
 .kilka__title {
-  max-width: 12em;
-  color: var(--c-white);
-  font-size: clamp(2rem, 1.2rem + 3.6vw, 4rem);
-  line-height: 1.08;
+  max-width: 70vw;
+  margin-top: 3vw;
+  font-size: clamp(1.75rem, 3vw, 3.625rem);
+  line-height: 1.2;
 }
 
 .kilka__title:focus {
   outline: none;
 }
 
-.kilka__scroll-hint {
-  position: absolute;
-  left: var(--gutter);
-  bottom: 32px;
-  color: var(--c-coral);
-  font-size: 28px;
-  animation: kilka-hint 1.8s ease-in-out infinite;
+/* Между слайдами — как в обычной презентации */
+.kilka__slide {
+  margin-top: clamp(56px, 10vw, 200px);
 }
 
-@keyframes kilka-hint {
-  0%, 100% { translate: 0 0; opacity: 0.6; }
-  50%      { translate: 0 8px; opacity: 1; }
+.kilka__slide--1 {
+  margin-top: 24vw;
 }
 
-/* Подзаголовок слайда */
+/* После первого слайда — место под большую банку справа */
+.kilka__slide--2 {
+  margin-top: 16vw;
+}
+
 .kilka__h3 {
-  margin-bottom: 20px;
-  color: var(--c-coral);
-  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  margin-bottom: clamp(18px, 3.4vw, 66px);
+  font-size: clamp(1.625rem, 3vw, 3.625rem);
 }
 
+/* Самые длинные строки макета доходят почти до нитки (~82% ширины) */
 .kilka__p {
-  line-height: 1.55;
+  max-width: 82vw;
+  font-size: clamp(0.9375rem, 1.45vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.6;
 }
 
 .kilka__p + .kilka__p,
-.kilka__dialog,
-.kilka__calc + .kilka__p {
-  margin-top: 16px;
+.kilka__calc + .kilka__p,
+.kilka__p + .kilka__calc,
+.kilka__calc + .kilka__calc {
+  margin-top: 1.6em;
 }
 
-/* Слайд 2: вычисления моноширинным шрифтом */
+/* Вычисления — по центру страницы, шрифтом заголовков */
 .kilka__calc {
-  margin-top: 12px;
-  color: var(--c-lemon);
-  font-family: ui-monospace, 'SFMono-Regular', Consolas, 'Courier New', monospace;
-  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
-  letter-spacing: 0.02em;
-}
-
-/* «6 6 6» — очень крупно, отдельной строкой */
-.kilka__big {
-  margin-top: 24px;
-  color: var(--c-coral);
   font-family: var(--font-heading);
-  font-size: clamp(4rem, 2rem + 10vw, 9rem);
+  font-size: clamp(0.9375rem, 1.4vw, 1.75rem);
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.15em;
-  white-space: nowrap;
+  text-align: center;
 }
 
-/* Строки появляются по одной, когда слайд входит в экран */
+/* Строки вычислений и 666 появляются по одной, когда слайд входит в экран */
 .kilka__reveal {
   opacity: 0;
   translate: 0 12px;
   transition: opacity 500ms var(--ease), translate 500ms var(--ease);
-  transition-delay: calc(var(--d) * 450ms + 150ms);
+  transition-delay: calc(var(--d) * 400ms + 150ms);
 }
 
 .kilka__slide.is-revealed .kilka__reveal {
@@ -140,30 +130,94 @@
   translate: 0 0;
 }
 
-/* Слайд 3: анекдот диалогом — каждая реплика с новой строки */
-.kilka__dialog {
-  padding-left: 16px;
-  border-left: 3px solid rgba(239, 141, 136, 0.5);
-  font-style: italic;
-  line-height: 1.5;
+/* ---------- Картинки ---------- */
+
+/* Большая банка на первом слайде: справа, покачивается, как айсберг на карте */
+.kilka__img--can {
+  position: absolute;
+  top: -5.5vw;
+  left: 69vw;
+  z-index: 2;
+  width: 25.5vw;
+  max-width: none;
+  animation: kilka-can-bob 4.2s ease-in-out infinite;
 }
 
-.kilka__dialog p + p {
-  margin-top: 6px;
+@keyframes kilka-can-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(4%) rotate(2deg); }
 }
 
-/* Слайд 7: кнопка-ссылка */
+/* 666 — анимированная гифка. Рамка показывает только цифры; белый фон гифки
+   «растворяется» в красном (multiply), подпись генератора остаётся за краем рамки */
+.kilka__gif {
+  width: min(38vw, 720px);
+  aspect-ratio: 400 / 220;
+  margin: 2vw auto 0;
+  overflow: hidden;
+  mix-blend-mode: multiply;
+}
+
+.kilka__gif img {
+  width: 150%;
+  max-width: none;
+  margin-top: -10%;
+  margin-left: -25%;
+}
+
+/* Анекдот — открытка по центру */
+.kilka__img--joke {
+  width: max(25vw, 260px);
+  margin: 3vw auto 0;
+}
+
+/* Диаграмма с рожками — справа от текста, нитка проходит поверх неё */
+.kilka__img--pie {
+  position: absolute;
+  top: -6vw;
+  left: 58vw;
+  z-index: -1;
+  width: 25vw;
+  max-width: none;
+}
+
+.kilka__slide--4 {
+  z-index: 0; /* чтобы диаграмма с z-index: -1 осталась под ниткой, но над фоном */
+}
+
+/* Рыба в космосе едет слева направо при прокрутке (js/kilka.js) */
+.kilka__drift {
+  max-width: 66vw;
+  margin-top: 2.6vw;
+}
+
+.kilka__img--drift {
+  width: max(10.3vw, 100px);
+  will-change: transform;
+}
+
+/* Маленькая банка в конце — на ней заканчивается нитка */
+.kilka__small-can {
+  position: absolute;
+  top: 11.5vw;
+  left: 76vw;
+  z-index: 2;
+  width: 4.5vw;
+  max-width: none;
+}
+
+/* Кнопка в конце лендинга */
 .kilka__cta {
   display: inline-flex;
   align-items: center;
-  align-self: flex-start;
   min-height: 52px;
-  margin-top: 28px;
-  padding: 14px 28px;
+  margin-top: 2.6vw;
+  padding: 14px 32px;
   border-radius: 999px;
-  color: var(--c-text);
-  background: #e8776d;
+  color: #8a0000;
+  background: var(--c-white);
   font-family: var(--font-heading);
+  font-size: clamp(1rem, 1.2vw, 1.375rem);
   font-weight: 700;
   text-decoration: none;
   transition: scale 150ms var(--ease);
@@ -177,105 +231,106 @@
   outline-color: var(--c-white);
 }
 
-/* ---------- Демон и йо-йо ----------
-   Положение банки, длина нитки и подъём демона считаются в js/kilka.js от прокрутки */
-
-.kilka__stage {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  width: 100%;
-  pointer-events: none;
-}
-
-.kilka__rig {
-  position: absolute;
-  top: 8px;
-  /* рука демона — у самого правого края, вдоль него тянется нитка */
-  right: calc(28px - var(--rig-h) / 1.8125 * 0.084);
-  --rig-h: min(34vh, 300px);
-  height: var(--rig-h);
-  aspect-ratio: 640 / 1160;
-}
-
-.kilka__demon {
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  /* на телефоне видны только голова и рука — ниже демон мягко растворяется */
-  -webkit-mask-image: linear-gradient(180deg, #000 36%, transparent 46%);
-  mask-image: linear-gradient(180deg, #000 36%, transparent 46%);
-}
-
-.kilka__string {
-  position: absolute;
-  width: 2px;
-  margin-left: -1px;
-  border-radius: 1px;
-  background: #f3e0c8;
-}
-
-.kilka__can {
-  position: absolute;
-  top: 0;
-  left: 0;
-  max-width: none;
-  height: auto;
-  will-change: transform;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
-}
-
-/* ---------- Десктоп: две колонки, демон в закреплённой колонке ---------- */
-
-@media (min-width: 768px) {
-  .kilka {
-    grid-template-columns: 60% 40%;
+/* Авторские переносы строк — только на широких экранах; уже — текст идёт сплошным абзацем */
+@media (max-width: 1099px) {
+  .kilka__p .text-line {
+    display: inline;
   }
 
-  .kilka__slides {
-    padding-right: 0;
+  .kilka__p .text-line + .text-line::before {
+    content: ' ';
+  }
+}
+
+/* ---------- Телефон: одна колонка, демон справа сверху, нитка вдоль правого края ---------- */
+
+@media (max-width: 767px) {
+  .kilka {
+    padding-bottom: 64px;
+  }
+
+  /* Не отзеркален: рука справа, нитка идёт вдоль правого края экрана */
+  .kilka__demon {
+    top: 20px;
+    left: 61vw;
+    width: 34vw;
+    transform: none;
+  }
+
+  .kilka__cover {
+    padding: 88px 38vw 0 var(--gutter);
   }
 
   .kilka__slide {
-    padding: 96px 48px 64px max(48px, 6vw);
+    margin-top: 64px;
+    padding: 0 14vw 0 var(--gutter);
   }
 
-  .kilka__scroll-hint {
-    left: max(48px, 6vw);
+  .kilka__slide--1 {
+    margin-top: 72px;
   }
 
-  .kilka__stage {
-    position: sticky;
-    top: 0;
-    bottom: auto;
-    width: auto;
-    height: 100vh;
-    height: 100dvh;
-    align-self: start;
-    /* мягкий тёплый свет за демоном, чтобы тёмные штаны читались на тёмном фоне */
-    background: radial-gradient(55% 45% at 55% 55%, rgba(255, 214, 165, 0.16), transparent 70%);
+  .kilka__slide--2 {
+    margin-top: 64px;
   }
 
-  .kilka__rig {
-    --rig-h: 58vh;
-    top: 0;
-    right: auto;
-    left: 50%;
-    margin-left: calc(var(--rig-h) / 1.8125 * -0.5);
+  .kilka__p {
+    max-width: none;
   }
 
-  .kilka__demon {
-    -webkit-mask-image: none;
-    mask-image: none;
+  .kilka__img--can {
+    position: relative;
+    top: auto;
+    left: auto;
+    display: block;
+    width: 52vw;
+    margin: 24px 0 0 auto;
+  }
+
+  .kilka__gif {
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .kilka__img--joke {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .kilka__img--pie {
+    position: relative;
+    top: auto;
+    left: auto;
+    z-index: auto;
+    display: block;
+    width: 72vw;
+    margin: 24px auto 0;
+  }
+
+  .kilka__drift {
+    max-width: none;
+    margin-top: 20px;
+  }
+
+  .kilka__img--drift {
+    width: 28vw;
+  }
+
+  .kilka__small-can {
+    top: 4px;
+    left: calc(92vw - 5vw);
+    width: 10vw;
+  }
+
+  .kilka__cta {
+    margin-top: 24px;
   }
 }
 
 /* ---------- Меньше движения ---------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .kilka__scroll-hint {
+  .kilka__img--can {
     animation: none;
   }
 

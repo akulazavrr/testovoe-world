@@ -1,52 +1,64 @@
-// Раздел «Килька в томате» — шуточная презентация. Задание: docs/03-kilka.md
+// Раздел «Килька в томате» — шуточная презентация. Задание: docs/03-kilka.md,
+// вёрстка автора: docs/references/ref-19-kilka-layout.pdf (решения автора 2026-10-08).
 //
-// Слева слайды (обложка + 7), справа закреплённая колонка с демоном и йо-йо из банки кильки.
-// Анимация привязана к прокрутке раздела, а не ко времени: в начале банка внизу на всю длину
-// нитки, к последнему слайду она поднимается, вращаясь, и возвращается в руку демона.
-// На телефоне демон маленький у правого края, нитка с банкой идут вдоль края — как индикатор прогресса.
+// Одна длинная страница на красном фоне. Демон наверху справа держит нитку йо-йо, она тянется
+// через всю страницу к маленькой банке в конце — статично (решение автора: без анимации йо-йо).
+// Движется только: большая банка (покачивается), гифка 666, рыба в космосе (едет при прокрутке).
 
-import { el, prefersReducedMotion, sectionTitleId } from './utils.js';
+import { el, prefersReducedMotion, sectionTitleId, setText } from './utils.js';
 
 const NAME = 'kilka';
 
-// Точки на картинке демона (assets/kilka/demon.png, 640×1160), в долях её размеров.
-// Посчитаны по исходнику автора: docs/references/ref-14-demon-source.webp
-const DEMON_RATIO = 1160 / 640;   // высота / ширина
-const HAND = { x: 0.916, y: 0.343 }; // кончики пальцев, откуда идёт нитка
-const STRING_LEN = 0.396;         // исходная длина нитки до банки — доля высоты демона
-const CAN_W = 0.24;               // ширина банки — доля ширины демона
-const CAN_RATIO = 229 / 220;      // высота / ширина банки
-const SPIN_TURNS = 2;             // сколько оборотов делает банка за весь раздел
+// Кончики пальцев на картинке демона (assets/kilka/demon.png), в долях её размеров.
+// На десктопе демон отзеркален, поэтому x берётся от другого края.
+const HAND = { x: 0.916, y: 0.343 };
+
+// Изгиб нитки по макету: x (доля ширины страницы) в точках по высоте от руки (0) до банки (1).
+// Крайние точки берутся из настоящих положений руки и банки.
+const STRING_DESKTOP = [[0.25, 0.80], [0.5, 0.755], [0.75, 0.75]];
+const STRING_MOBILE = [[0.33, 0.935], [0.66, 0.905]];
 
 let root = null;
-let stage = null;
-let rig = null;
-let stringEl = null;
-let can = null;
+let page = null;
+let demon = null;
+let smallCan = null;
+let stringSvg = null;
+let stringPath = null;
+let fish = null;
 let slide2 = null;
 let ticking = false;
 
+function isMobile() {
+  return window.matchMedia('(max-width: 767px)').matches;
+}
+
 // ---------- Слайды ----------
 
-function renderContent(items) {
+function renderContent(items, counter) {
   const out = [];
-  let reveal = 0; // порядковый номер строки, которая появляется по очереди на слайде 2
   for (const item of items) {
-    if (item.p) out.push(el('p', { className: 'kilka__p', text: item.p }));
+    if (item.p) out.push(setText(el('p', { className: 'kilka__p' }), item.p));
     if (item.calc) {
       for (const line of item.calc) {
         const node = el('p', { className: 'kilka__calc kilka__reveal', text: line });
-        node.style.setProperty('--d', reveal++);
+        node.style.setProperty('--d', counter.n++);
         out.push(node);
       }
     }
-    if (item.big) {
-      const node = el('p', { className: 'kilka__big kilka__reveal', text: item.big });
-      node.style.setProperty('--d', reveal++);
-      out.push(node);
-    }
-    if (item.dialog) {
-      out.push(el('div', { className: 'kilka__dialog' }, item.dialog.map((line) => el('p', { text: line }))));
+    if (item.img) {
+      const { kind, src, alt } = item.img;
+      const img = el('img', { className: `kilka__img kilka__img--${kind}`, src, alt, loading: 'lazy', decoding: 'async' });
+      if (kind === 'gif') {
+        // Рамка показывает только цифры: белый фон и подпись генератора остаются за краем
+        const frame = el('div', { className: 'kilka__gif kilka__reveal' }, [img]);
+        frame.style.setProperty('--d', counter.n++);
+        out.push(frame);
+      } else if (kind === 'drift') {
+        fish = img;
+        out.push(el('div', { className: 'kilka__drift' }, [img]));
+      } else {
+        out.push(img);
+      }
     }
     if (item.link) {
       out.push(el('a', {
@@ -61,60 +73,66 @@ function renderContent(items) {
   return out;
 }
 
-// ---------- Демон и йо-йо ----------
+// ---------- Нитка йо-йо ----------
 
-function isMobile() {
-  return window.matchMedia('(max-width: 767px)').matches;
-}
-
-// Прогресс прокрутки раздела: 0 — начало, 1 — последний слайд
-function progress() {
-  const max = root.scrollHeight - root.clientHeight;
-  return max > 0 ? Math.min(1, Math.max(0, root.scrollTop / max)) : 0;
-}
-
-function update() {
-  ticking = false;
-  const p = prefersReducedMotion() ? 1 : progress();
-  const rigH = rig.offsetHeight;
-  const rigW = rig.offsetWidth;
-  const stageH = stage.clientHeight;
-  const canW = rigW * CAN_W;
-  const canH = canW * CAN_RATIO;
-  const handX = rigW * HAND.x;
-  const handY = rigH * HAND.y;
-
-  let lift = 0;      // насколько демон поднялся (px вверх от начального места)
-  let maxLen;        // длина нитки в начале
-  if (isMobile()) {
-    // Демон стоит наверху, нитка тянется почти до низа экрана
-    rig.style.transform = '';
-    const handOnScreen = rig.getBoundingClientRect().top + handY;
-    maxLen = Math.max(0, window.innerHeight - handOnScreen - canH - 24);
-  } else {
-    // Демон поднимается снизу колонки к верху
-    const pad = stageH * 0.04;
-    const startTop = stageH - rigH - pad;
-    lift = (startTop - pad) * p;
-    rig.style.transform = `translateY(${startTop - lift}px)`;
-    maxLen = rigH * STRING_LEN;
+// Плавная кривая через точки (сплайн Катмулла — Рома, переведённый в кривые Безье)
+function smoothPath(points) {
+  let d = `M${points[0][0]} ${points[0][1]}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1] || points[i];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[i + 2] || p2;
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1[0]} ${c1[1]} ${c2[0]} ${c2[1]} ${p2[0]} ${p2[1]}`;
   }
-
-  // Центр банки опускается от руки на длину нитки + половину банки; при p = 1 — в руке
-  const canCenterY = handY + (maxLen + canH / 2) * (1 - p);
-  const stringLen = Math.max(0, canCenterY - canH / 2 - handY);
-  stringEl.style.height = `${stringLen}px`;
-  stringEl.style.left = `${handX}px`;
-  stringEl.style.top = `${handY}px`;
-  can.style.width = `${canW}px`;
-  can.style.transform =
-    `translate(${handX - canW / 2}px, ${canCenterY - canH / 2}px) rotate(${p * 360 * SPIN_TURNS}deg)`;
+  return d;
 }
 
-function requestUpdate() {
+// Перерисовывает нитку от руки демона до маленькой банки по реальным положениям на странице
+function drawString() {
+  const base = page.getBoundingClientRect();
+  const w = page.offsetWidth;
+  const h = page.offsetHeight;
+  const d = demon.getBoundingClientRect();
+  const c = smallCan.getBoundingClientRect();
+  if (!d.width || !c.width) return;
+
+  const mirrored = !isMobile();
+  const hand = [
+    d.left - base.left + d.width * (mirrored ? 1 - HAND.x : HAND.x),
+    d.top - base.top + d.height * HAND.y,
+  ];
+  const end = [c.left - base.left + c.width / 2, c.top - base.top + c.height * 0.12];
+  const mids = (isMobile() ? STRING_MOBILE : STRING_DESKTOP)
+    .map(([t, x]) => [x * w, hand[1] + (end[1] - hand[1]) * t]);
+
+  stringSvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  stringPath.setAttribute('d', smoothPath([hand, ...mids, end]));
+}
+
+// ---------- Рыба едет слева направо при прокрутке ----------
+
+function moveFish() {
+  ticking = false;
+  if (!fish) return;
+  if (prefersReducedMotion()) {
+    fish.style.transform = '';
+    return;
+  }
+  const r = fish.parentElement.getBoundingClientRect();
+  const vh = root.clientHeight;
+  // 0 — блок только показался снизу, 1 — уходит за верх экрана
+  const p = Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
+  const max = Math.max(0, r.width - fish.offsetWidth);
+  fish.style.transform = `translateX(${max * p}px)`;
+}
+
+function requestFish() {
   if (ticking) return;
   ticking = true;
-  requestAnimationFrame(update);
+  requestAnimationFrame(moveFish);
 }
 
 // ---------- Раздел ----------
@@ -122,57 +140,59 @@ function requestUpdate() {
 export function init(sectionRoot, content) {
   root = sectionRoot;
   const data = content.sections[NAME];
+  const counter = { n: 0 };
 
-  const cover = el('section', { className: 'kilka__slide kilka__slide--cover' }, [
+  const cover = el('section', { className: 'kilka__cover' }, [
     el('p', { className: 'kilka__kicker', text: data.cover.subtitle }),
     el('h2', { className: 'kilka__title', id: sectionTitleId(NAME), tabIndex: -1, text: data.cover.title }),
-    el('span', { className: 'kilka__scroll-hint', attrs: { 'aria-hidden': 'true' }, text: '↓' }),
   ]);
 
-  const slides = data.slides.map((slide, i) =>
-    el('section', { className: `kilka__slide kilka__slide--${i + 1}` }, [
-      el('div', { className: 'kilka__slide-inner' }, [
-        el('h3', { className: 'kilka__h3', text: slide.title }),
-        ...renderContent(slide.content),
-      ]),
-    ]),
-  );
+  const slides = data.slides.map((slide, i) => {
+    if (i === 1) counter.n = 0;
+    return el('section', { className: `kilka__slide kilka__slide--${i + 1}` }, [
+      el('h3', { className: 'kilka__h3', text: slide.title }),
+      ...renderContent(slide.content, counter),
+    ]);
+  });
   slide2 = slides[1];
 
-  stringEl = el('span', { className: 'kilka__string' });
-  can = el('img', { className: 'kilka__can', src: 'assets/kilka/can.png', alt: '', loading: 'lazy', decoding: 'async' });
-  rig = el('div', { className: 'kilka__rig' }, [
-    el('img', { className: 'kilka__demon', src: 'assets/kilka/demon.png', alt: '', loading: 'lazy', decoding: 'async' }),
-    stringEl,
-    can,
-  ]);
-  stage = el('div', { className: 'kilka__stage', attrs: { 'aria-hidden': 'true' } }, [rig]);
+  demon = el('img', { className: 'kilka__demon', src: 'assets/kilka/demon.png', alt: '', loading: 'lazy', decoding: 'async' });
+  smallCan = el('img', { className: 'kilka__small-can', src: 'assets/kilka/can.png', alt: '', loading: 'lazy', decoding: 'async' });
+  stringPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  stringSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  stringSvg.setAttribute('class', 'kilka__string');
+  stringSvg.setAttribute('aria-hidden', 'true');
+  stringSvg.setAttribute('preserveAspectRatio', 'none');
+  stringSvg.append(stringPath);
 
-  root.replaceChildren(
-    el('div', { className: 'kilka' }, [
-      el('div', { className: 'kilka__slides' }, [cover, ...slides]),
-      stage,
-    ]),
-  );
+  // Маленькая банка — в конце, рядом с последним слайдом
+  slides[slides.length - 1].append(smallCan);
 
-  root.addEventListener('scroll', requestUpdate, { passive: true });
-  window.addEventListener('resize', requestUpdate);
+  page = el('div', { className: 'kilka' }, [stringSvg, demon, cover, ...slides]);
+  root.replaceChildren(page);
 
-  // Строки с вычислениями на слайде 2 появляются по одной, когда слайд входит в экран
+  // Нитка пересчитывается при любом изменении размеров страницы и после загрузки картинок
+  new ResizeObserver(drawString).observe(page);
+  for (const img of page.querySelectorAll('img')) img.addEventListener('load', drawString);
+
+  root.addEventListener('scroll', requestFish, { passive: true });
+  window.addEventListener('resize', requestFish);
+
+  // Строки вычислений и 666 на слайде 2 появляются по одной, когда слайд входит в экран
   new IntersectionObserver(
     (entries) => {
       if (entries.some((e) => e.isIntersecting)) slide2.classList.add('is-revealed');
     },
-    { root, threshold: 0.35 },
+    { root, threshold: 0.25 },
   ).observe(slide2);
-
-  // Картинки грузятся лениво: пересчитать, когда станут известны их размеры
-  can.addEventListener('load', requestUpdate);
 }
 
 export function onOpen() {
   slide2.classList.toggle('is-revealed', prefersReducedMotion());
-  requestUpdate();
+  requestAnimationFrame(() => {
+    drawString();
+    moveFish();
+  });
 }
 
 export function onClose() {}
