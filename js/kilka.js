@@ -142,9 +142,15 @@ export function init(sectionRoot, content) {
   const data = content.sections[NAME];
   const counter = { n: 0 };
 
+  // Начало заголовка («Килька в томате:») не разрывается переносом
+  const { title, titleKeep } = data.cover;
+  const keep = titleKeep && title.startsWith(titleKeep) ? titleKeep : '';
   const cover = el('section', { className: 'kilka__cover' }, [
     el('p', { className: 'kilka__kicker', text: data.cover.subtitle }),
-    el('h2', { className: 'kilka__title', id: sectionTitleId(NAME), tabIndex: -1, text: data.cover.title }),
+    el('h2', { className: 'kilka__title', id: sectionTitleId(NAME), tabIndex: -1 }, [
+      el('span', { className: 'kilka__nowrap', text: keep }),
+      title.slice(keep.length),
+    ]),
   ]);
 
   const slides = data.slides.map((slide, i) => {

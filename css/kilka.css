@@ -71,6 +71,10 @@
   line-height: 1.2;
 }
 
+.kilka__nowrap {
+  white-space: nowrap;
+}
+
 .kilka__title:focus {
   outline: none;
 }
@@ -131,6 +135,15 @@
 }
 
 /* ---------- Картинки ---------- */
+
+/* Текст первого слайда заканчивается левее большой банки, четвёртого — левее диаграммы */
+.kilka__slide--1 .kilka__p {
+  max-width: 62vw;
+}
+
+.kilka__slide--4 .kilka__p {
+  max-width: 52vw;
+}
 
 /* Большая банка на первом слайде: справа, покачивается, как айсберг на карте */
 .kilka__img--can {
@@ -231,8 +244,8 @@
   outline-color: var(--c-white);
 }
 
-/* Авторские переносы строк — только на широких экранах; уже — текст идёт сплошным абзацем */
-@media (max-width: 1099px) {
+/* Авторские переносы строк работают везде, кроме телефона: там текст идёт сплошным абзацем */
+@media (max-width: 767px) {
   .kilka__p .text-line {
     display: inline;
   }
@@ -252,13 +265,29 @@
   /* Не отзеркален: рука справа, нитка идёт вдоль правого края экрана */
   .kilka__demon {
     top: 20px;
-    left: 61vw;
-    width: 34vw;
+    left: 66vw;
+    width: 28vw;
     transform: none;
   }
 
+  /* Подзаголовок — рядом с демоном, заголовок — под ним, на всю ширину до нитки */
   .kilka__cover {
-    padding: 88px 38vw 0 var(--gutter);
+    padding: 84px 10vw 0 var(--gutter);
+  }
+
+  .kilka__kicker {
+    max-width: 52vw;
+  }
+
+  .kilka__title {
+    max-width: none;
+    margin-top: 72px;
+    font-size: clamp(1.375rem, 6.8vw, 1.75rem);
+  }
+
+  .kilka__slide--1 .kilka__p,
+  .kilka__slide--4 .kilka__p {
+    max-width: none;
   }
 
   .kilka__slide {
